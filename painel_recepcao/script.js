@@ -1,6 +1,12 @@
 const WEB_APP_URL =
     "https://script.google.com/macros/s/AKfycbyiKkNeQFdXwJukv8MRCGm6lm8mMf06aaBZX-8yBaqA8Rp84QxTb1venFcRptzsgCve-w/exec";
 
+// Auto‐reload a cada 15 minutos para manter a sessão ativa
+setInterval(() => {
+    alert("⏳ 15 minutos se passaram. O painel será recarregado.");
+    location.reload();
+}, 15 * 60 * 1000);
+
 let senhas = [];
 const tbody = document.querySelector("#senhaTable tbody");
 const POLLING_INTERVAL = 5000;

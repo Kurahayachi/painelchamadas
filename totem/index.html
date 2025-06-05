@@ -30,6 +30,12 @@
     <div id="senha">–––</div>
 
     <script>
+        // Auto‐reload a cada 15 minutos (900000 ms)
+        setInterval(() => {
+            alert("⏳ 15 minutos se passaram. O Totem será recarregado.");
+            location.reload();
+        }, 15 * 60 * 1000);
+
         const URL =
             "https://script.google.com/macros/s/AKfycbzEgBN6u8DPQt5wvnPzpsSwXSdq2xR0lhtaE0kO1UxfOKSMSbD1CPDvk9jjiy0ZqLh1/exec";
 
@@ -56,7 +62,7 @@
                 .finally(() => {
                     setTimeout(() => (btn.disabled = false), 1000);
                 });
-        }; // TESTANDO DNV
+        };
     </script>
 </body>
 
