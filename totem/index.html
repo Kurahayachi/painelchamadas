@@ -1,58 +1,63 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <title>Totem de Senhas</title>
     <style>
-      body {
-        font-family: sans-serif;
-        text-align: center;
-        padding: 50px;
-      }
-      button {
-        font-size: 24px;
-        padding: 10px 20px;
-      }
-      #senha {
-        margin-top: 30px;
-        font-size: 48px;
-        font-weight: bold;
-      }
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            padding: 50px;
+        }
+        
+        button {
+            font-size: 24px;
+            padding: 10px 20px;
+        }
+        
+        #senha {
+            margin-top: 30px;
+            font-size: 48px;
+            font-weight: bold;
+        }
     </style>
-  </head>
-  <body>
+</head>
+
+<body>
     <h1>Totem de Senhas</h1>
     <button id="btn">Gerar Senha</button>
     <div id="senha">–––</div>
 
     <script>
-      const URL =
-        "https://script.google.com/macros/s/AKfycbwca01WcYglB65oDX6twiYRPJPw7BIFgbUx7x1AzW9a6rEE1UHzW46C7O45hK8G_zdFAQ/exec";
+        const URL =
+            "https://script.google.com/macros/s/AKfycbxdNBiuBwq-0UMavoCBFKjaZ_tegD7h7xV5ZqcRTnR8eqB8vMa6RiFp6OMLpZB9vQAM7Q/exec";
 
-      // Quando a impressão terminar, volta ao estado inicial
-      window.onafterprint = () => {
-        document.getElementById("senha").innerText = "–––";
-      };
+        // Quando a impressão terminar, volta ao estado inicial
+        window.onafterprint = () => {
+            document.getElementById("senha").innerText = "–––";
+        };
 
-      document.getElementById("btn").onclick = () => {
-        const btn = document.getElementById("btn");
-        btn.disabled = true;
+        document.getElementById("btn").onclick = () => {
+            const btn = document.getElementById("btn");
+            btn.disabled = true;
 
-        fetch(URL)
-          .then((r) => r.text())
-          .then((text) => {
-            const code = text.replace("Sua senha é: ", "");
-            document.getElementById("senha").innerText = code;
-            window.print();
-          })
-          .catch((err) => {
-            console.error(err);
-            alert("Erro ao gerar senha");
-          })
-          .finally(() => {
-            setTimeout(() => (btn.disabled = false), 1000);
-          });
-      }; // TESTANDO DNV
+            fetch(URL)
+                .then((r) => r.text())
+                .then((text) => {
+                    const code = text.replace("Sua senha é: ", "");
+                    document.getElementById("senha").innerText = code;
+                    window.print();
+                })
+                .catch((err) => {
+                    console.error(err);
+                    alert("Erro ao gerar senha");
+                })
+                .finally(() => {
+                    setTimeout(() => (btn.disabled = false), 1000);
+                });
+        }; // TESTANDO DNV
     </script>
-  </body>
+</body>
+
 </html>
