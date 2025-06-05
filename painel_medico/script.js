@@ -1,9 +1,9 @@
 const WEB_APP_URL =
     "https://script.google.com/macros/s/AKfycbxismeV4ufjPbtKZA4dBYS2M0A69r_EbZ8WuVn8WM-y0WPlCT2GabPsK8GWhfwyCHDJ/exec";
 
-// Auto‐reload a cada 15 minutos para manter a sessão ativa
+// Auto-reload a cada 15 minutos para amnter a sessão ativa
 setInterval(() => {
-    alert("⏳ 15 minutos se passaram. O painel será recarregado.");
+    console.log("⏳ 5 minutos se passaram, recarregando o painel de médico...");
     location.reload();
 }, 15 * 60 * 1000);
 
