@@ -1,6 +1,13 @@
 const WEB_APP_URL =
     "https://script.google.com/macros/s/AKfycbxismeV4ufjPbtKZA4dBYS2M0A69r_EbZ8WuVn8WM-y0WPlCT2GabPsK8GWhfwyCHDJ/exec";
 
+// A cada 5 minutos (300 000 ms), recarrega a página inteira para renovar sessão.// teste
+
+setInterval(() => {
+    console.log("⏳ 5 minutos se passaram, recarregando o painel de médico...");
+    location.reload();
+}, 5 * 60 * 1000);
+
 let senhas = [];
 let consultorioSelecionado = "";
 let especialidadesSelecionadas = [];
