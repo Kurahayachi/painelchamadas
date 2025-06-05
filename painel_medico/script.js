@@ -1,5 +1,5 @@
 const WEB_APP_URL =
-    "https://script.google.com/macros/s/AKfycbxZhmG8PL94n4Ppk03ngDp3GilJvPoV_fR2yn6OizhS2SBxoXeUZ1mJqeh8WK0hGvY/exec";
+    "https://script.google.com/macros/s/AKfycbxismeV4ufjPbtKZA4dBYS2M0A69r_EbZ8WuVn8WM-y0WPlCT2GabPsK8GWhfwyCHDJ/exec";
 
 let senhas = [];
 let consultorioSelecionado = "";
