@@ -1,49 +1,72 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
-<head>
+  <head>
     <meta charset="UTF-8" />
     <title>Painel Recepção</title>
     <link rel="stylesheet" href="style.css" />
-</head>
+  </head>
 
-<body>
+  <body>
     <h1>
-        Painel Recepção
-        <button id="btnEngrenagem" title="Selecionar Máquina" style="font-size: 1.3rem; margin-left: 15px; cursor: pointer">⚙️</button>
-        <span id="spanMaquina" style="font-size: 1rem; margin-left: 10px; color: #555"></span>
+      Painel Recepção
+      <button
+        id="btnEngrenagem"
+        title="Selecionar Máquina"
+        style="font-size: 1.3rem; margin-left: 15px; cursor: pointer"
+      >
+        ⚙️
+      </button>
+      <span
+        id="spanMaquina"
+        style="font-size: 1rem; margin-left: 10px; color: #555"
+      ></span>
     </h1>
 
     <table id="senhaTable">
-        <thead>
-            <tr>
-                <th>Senha</th>
-                <th>Data/Hora</th>
-                <th>Status</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
+      <thead>
+        <tr>
+          <th>Senha</th>
+          <th>Data/Hora</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
     </table>
 
-    <!-- Modal para seleção de máquina -->
+    <!-- Modal para seleção de máquina  -->
     <div id="modalMaquina" class="modal">
-        <div id="modalMaquinaContent">
-            <h2>Selecionar Máquina</h2>
-            <form id="formMaquina">
-                <label><input type="radio" name="recepcao" value="Recepção 01" /> Recepção 01</label>
-                <label><input type="radio" name="recepcao" value="Recepção 02" /> Recepção 02</label>
-                <label><input type="radio" name="recepcao" value="Recepção 03" /> Recepção 03</label>
-                <label><input type="radio" name="recepcao" value="Recepção 04" /> Recepção 04</label>
-                <div style="margin-top: 15px;">
-                    <button type="button" id="salvarMaquinaBtn" class="btn-primario">Salvar</button>
-                    <button type="button" id="cancelarMaquinaBtn" class="btn-perigo">Cancelar</button>
-                </div>
-            </form>
-        </div>
+      <div id="modalMaquinaContent">
+        <h2>Selecionar Máquina</h2>
+        <form id="formMaquina">
+          <label
+            ><input type="radio" name="recepcao" value="Recepção 01" /> Recepção
+            01</label
+          >
+          <label
+            ><input type="radio" name="recepcao" value="Recepção 02" /> Recepção
+            02</label
+          >
+          <label
+            ><input type="radio" name="recepcao" value="Recepção 03" /> Recepção
+            03</label
+          >
+          <label
+            ><input type="radio" name="recepcao" value="Recepção 04" /> Recepção
+            04</label
+          >
+          <div style="margin-top: 15px">
+            <button type="button" id="salvarMaquinaBtn" class="btn-primario">
+              Salvar
+            </button>
+            <button type="button" id="cancelarMaquinaBtn" class="btn-perigo">
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
 
     <script src="script.js" defer></script>
-</body>
-
+  </body>
 </html>
