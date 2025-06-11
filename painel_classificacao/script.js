@@ -220,24 +220,24 @@ salvarMaquinaBtn.addEventListener("click", () => {
     carregarSenhas(maquina);
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-    try {
-        const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
-        spanMaquina.textContent = `(Máquina atual: ${maquina})`;
+window.addEventListener("load", () => {
+  const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
+  spanMaquina.textContent = `(Máquina atual: ${maquina})`;
 
-        window.abrirModal = abrirModal;
-        window.excluirSenha = excluirSenha;
-        window.finalizarTriagem = finalizarTriagem;
+  window.abrirModal = abrirModal;
+  window.excluirSenha = excluirSenha;
+  window.finalizarTriagem = finalizarTriagem;
 
-        cancelarBtn.addEventListener("click", cancelarModal);
-        salvarBtn.addEventListener("click", salvarDados);
-        finalizarBtn.addEventListener("click", finalizarTriagemModal);
+  cancelarBtn.addEventListener("click", cancelarModal);
+  salvarBtn.addEventListener("click", salvarDados);
+  finalizarBtn.addEventListener("click", finalizarTriagemModal);
 
-        iniciarAtualizacaoAutomatica();
-    } catch (err) {
-        console.error("Erro no carregamento inicial:", err);
-        alert("Erro ao carregar o painel. Tente recarregar a página ou aguarde.");
-    }
+  try {
+    iniciarAtualizacaoAutomatica();
+  } catch (error) {
+    console.warn("Erro ao iniciar atualização automática:", error);
+    mostrarMensagem("Não foi possível carregar os dados. Tente novamente.");
+  }
 });
 
 async function chamarPaciente(botao) {
