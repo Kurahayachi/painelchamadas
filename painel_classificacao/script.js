@@ -51,7 +51,7 @@ function render() {
         if (status === "Em triagem") {
             botoes += `<button class="btn-finalizar" onclick="finalizarTriagem('${senha}')">Finalizar Classificação</button>`;
         } else {
-            botoes += `<button class="btn-chamar chamarBtn" data-senha="${senha}">📣</button>`;
+            botoes += `<button class="btn-chamar chamarBtn" data-senha="${senha}">📣 Chamar </button>`;
             botoes += `<button class="btn-primario editarBtn" data-senha="${senha}">Editar</button>`;
             botoes += `<button class="btn-perigo" onclick="excluirSenha('${senha}')">Excluir</button>`;
         }
