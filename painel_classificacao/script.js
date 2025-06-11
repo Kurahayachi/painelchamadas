@@ -1,4 +1,11 @@
-// --- script.js COMPLETO E CORRIGIDO PARA PAINEL DE CLASSIFICAÇÃO ---
+/**
+ * Sistema de Gestão de Atendimento
+ * Desenvolvido por Igor M. Kurahayachi
+ * Analista de Sistemas - Rede Santa Catarina
+ * Todos os direitos reservados.
+ * Uso interno permitido mediante autorização do autor.
+ */
+
 
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxKZrXYpStk9qGgGMzaiR8kO9UCSQVR-YjdXjJ4JhmD1dtDo8gmWRW1TTrkgXk4dDD0/exec";
 
@@ -214,18 +221,23 @@ salvarMaquinaBtn.addEventListener("click", () => {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-    const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
-    spanMaquina.textContent = `(Máquina atual: ${maquina})`;
+    try {
+        const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
+        spanMaquina.textContent = `(Máquina atual: ${maquina})`;
 
-    window.abrirModal = abrirModal;
-    window.excluirSenha = excluirSenha;
-    window.finalizarTriagem = finalizarTriagem;
+        window.abrirModal = abrirModal;
+        window.excluirSenha = excluirSenha;
+        window.finalizarTriagem = finalizarTriagem;
 
-    cancelarBtn.addEventListener("click", cancelarModal);
-    salvarBtn.addEventListener("click", salvarDados);
-    finalizarBtn.addEventListener("click", finalizarTriagemModal);
+        cancelarBtn.addEventListener("click", cancelarModal);
+        salvarBtn.addEventListener("click", salvarDados);
+        finalizarBtn.addEventListener("click", finalizarTriagemModal);
 
-    iniciarAtualizacaoAutomatica();
+        iniciarAtualizacaoAutomatica();
+    } catch (err) {
+        console.error("Erro no carregamento inicial:", err);
+        alert("Erro ao carregar o painel. Tente recarregar a página ou aguarde.");
+    }
 });
 
 async function chamarPaciente(botao) {
