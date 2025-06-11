@@ -1,7 +1,6 @@
+// --- script.js COMPLETO E CORRIGIDO PARA PAINEL DE CLASSIFICAÇÃO ---
 
-// --- script.js COMPLETO E FUNCIONAL PARA PAINEL DE CLASSIFICAÇÃO ---
-
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxwpBWinCAKNJlN2dR4sRk98vXgogfUypj3VfVBOYUuutp2CxoylHRfcFTW7ZjG4f_P/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxKZrXYpStk9qGgGMzaiR8kO9UCSQVR-YjdXjJ4JhmD1dtDo8gmWRW1TTrkgXk4dDD0/exec";
 
 setInterval(() => {
     console.log("15 minutos se passaram, recarregando o painel...");
@@ -32,18 +31,6 @@ const spanMaquina = document.getElementById("spanMaquina");
 
 const notificador = document.createElement("div");
 notificador.id = "notificador";
-Object.assign(notificador.style, {
-    position: "fixed",
-    top: "15px",
-    left: "50%",
-    transform: "translateX(-50%)",
-    background: "#38c172",
-    color: "white",
-    padding: "10px 20px",
-    borderRadius: "5px",
-    display: "none",
-    zIndex: "9999"
-});
 document.body.appendChild(notificador);
 
 function mostrarMensagem(texto) {
@@ -54,6 +41,7 @@ function mostrarMensagem(texto) {
     }, 3000);
 }
 
+
 function render() {
     tbody.innerHTML = "";
     senhas.forEach(({ senha, data, status }) => {
@@ -63,7 +51,7 @@ function render() {
         if (status === "Em triagem") {
             botoes += `<button class="btn-finalizar" onclick="finalizarTriagem('${senha}')">Finalizar Classificação</button>`;
         } else {
-            botoes += `<button class="btn-primario chamarBtn" data-senha="${senha}">Chamar</button>`;
+            botoes += `<button class="btn-chamar chamarBtn" data-senha="${senha}">📣</button>`;
             botoes += `<button class="btn-primario editarBtn" data-senha="${senha}">Editar</button>`;
             botoes += `<button class="btn-perigo" onclick="excluirSenha('${senha}')">Excluir</button>`;
         }
@@ -240,7 +228,6 @@ document.addEventListener("DOMContentLoaded", () => {
     iniciarAtualizacaoAutomatica();
 });
 
-// ✅ NOVA FUNÇÃO: Registrar chamada na aba ChamadaTV
 async function chamarPaciente(botao) {
     const senha = botao.dataset.senha;
     const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
