@@ -1,6 +1,7 @@
+
 // --- script.js COMPLETO E FUNCIONAL PARA PAINEL DE CLASSIFICAÇÃO ---
 
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxiGQk2vxv-rehFOAIf5wz7_VlSHIEegFBmYE3wuVB12VPgoTNTxI1FLa0G1zOBDnCc/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxwpBWinCAKNJlN2dR4sRk98vXgogfUypj3VfVBOYUuutp2CxoylHRfcFTW7ZjG4f_P/exec";
 
 setInterval(() => {
     console.log("15 minutos se passaram, recarregando o painel...");
