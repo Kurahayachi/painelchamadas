@@ -1,11 +1,9 @@
-// --- script.js FINAL - AJUSTADO E COMENTADO ---
+// --- script.js COMPLETO E FUNCIONAL PARA PAINEL DE CLASSIFICAÇÃO ---
 
-const WEB_APP_URL =
-    "https://script.google.com/macros/s/AKfycbwVFXwNuz89bYjKDF6zax8Vm5koy8tONEl6K73xuwwTOputReFpRTCIfVM8AGo4epIK/exec";
-//teste//
-// Auto-reload a cada 15 minutos para manter a sessão ativa //
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxiGQk2vxv-rehFOAIf5wz7_VlSHIEegFBmYE3wuVB12VPgoTNTxI1FLa0G1zOBDnCc/exec";
+
 setInterval(() => {
-    console.log("⏳ 5 minutos se passaram, recarregando o painel de médico...");
+    console.log("15 minutos se passaram, recarregando o painel...");
     location.reload();
 }, 15 * 60 * 1000);
 
@@ -15,7 +13,6 @@ let senhaSelecionada = "";
 const tbody = document.querySelector("#senhaTable tbody");
 const POLLING_INTERVAL = 5000;
 
-// Modal Paciente
 const modal = document.getElementById("modal");
 const nomeInput = document.getElementById("nome");
 const idadeInput = document.getElementById("idade");
@@ -26,26 +23,26 @@ const salvarBtn = document.getElementById("salvarBtn");
 const cancelarBtn = document.getElementById("cancelarBtn");
 const finalizarBtn = document.getElementById("finalizarBtn");
 
-// Modal Máquina
 const modalMaquina = document.getElementById("modalMaquina");
 const btnEngrenagem = document.getElementById("btnEngrenagem");
 const salvarMaquinaBtn = document.getElementById("salvarMaquinaBtn");
 const cancelarMaquinaBtn = document.getElementById("cancelarMaquinaBtn");
 const spanMaquina = document.getElementById("spanMaquina");
 
-// Notificador
 const notificador = document.createElement("div");
 notificador.id = "notificador";
-notificador.style.position = "fixed";
-notificador.style.top = "15px";
-notificador.style.left = "50%";
-notificador.style.transform = "translateX(-50%)";
-notificador.style.background = "#38c172";
-notificador.style.color = "white";
-notificador.style.padding = "10px 20px";
-notificador.style.borderRadius = "5px";
-notificador.style.display = "none";
-notificador.style.zIndex = "9999";
+Object.assign(notificador.style, {
+    position: "fixed",
+    top: "15px",
+    left: "50%",
+    transform: "translateX(-50%)",
+    background: "#38c172",
+    color: "white",
+    padding: "10px 20px",
+    borderRadius: "5px",
+    display: "none",
+    zIndex: "9999"
+});
 document.body.appendChild(notificador);
 
 function mostrarMensagem(texto) {
@@ -61,12 +58,15 @@ function render() {
     senhas.forEach(({ senha, data, status }) => {
         const tr = document.createElement("tr");
         let botoes = "";
+
         if (status === "Em triagem") {
             botoes += `<button class="btn-finalizar" onclick="finalizarTriagem('${senha}')">Finalizar Classificação</button>`;
         } else {
-            botoes += `<button class="btn-primario" onclick="abrirModal('${senha}')">Chamar</button>`;
+            botoes += `<button class="btn-primario chamarBtn" data-senha="${senha}">Chamar</button>`;
+            botoes += `<button class="btn-primario editarBtn" data-senha="${senha}">Editar</button>`;
             botoes += `<button class="btn-perigo" onclick="excluirSenha('${senha}')">Excluir</button>`;
         }
+
         tr.innerHTML = `
       <td>${senha}</td>
       <td>${new Date(data).toLocaleString()}</td>
@@ -75,13 +75,19 @@ function render() {
     `;
         tbody.appendChild(tr);
     });
+
+    document.querySelectorAll(".chamarBtn").forEach(btn => {
+        btn.addEventListener("click", () => chamarPaciente(btn));
+    });
+
+    document.querySelectorAll(".editarBtn").forEach(btn => {
+        btn.addEventListener("click", () => abrirModal(btn.dataset.senha));
+    });
 }
 
 async function carregarSenhas(maquina) {
     try {
-        const resp = await fetch(
-            `${WEB_APP_URL}?action=listar&maquina=${encodeURIComponent(maquina)}`
-        );
+        const resp = await fetch(`${WEB_APP_URL}?action=listar&maquina=${encodeURIComponent(maquina)}`);
         senhas = await resp.json();
         render();
     } catch (err) {
@@ -93,7 +99,7 @@ function abrirModal(senha) {
     senhaSelecionada = senha;
     limparFormulario();
     modal.classList.add("show");
-    finalizarBtn.disabled = true; // Inicialmente desabilitado
+    finalizarBtn.disabled = true;
 }
 
 function cancelarModal() {
@@ -115,8 +121,7 @@ async function salvarDados() {
     const especialidade = especialidadeInput.value.trim();
     const cor = corInput.value;
     const observacao = observacaoInput.value.trim();
-    const maquina =
-        localStorage.getItem("maquinaSelecionada") || "Classificação 01";
+    const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
 
     if (!nome || !idade || !especialidade || !cor) {
         alert("Por favor, preencha todos os campos obrigatórios.");
@@ -124,21 +129,11 @@ async function salvarDados() {
     }
 
     try {
-        const resp = await fetch(
-            `${WEB_APP_URL}?action=chamar&senha=${encodeURIComponent(
-        senhaSelecionada
-      )}&maquina=${encodeURIComponent(maquina)}&nome=${encodeURIComponent(
-        nome
-      )}&idade=${encodeURIComponent(idade)}&especialidade=${encodeURIComponent(
-        especialidade
-      )}&cor=${encodeURIComponent(cor)}&observacao=${encodeURIComponent(
-        observacao
-      )}`
-        );
+        const resp = await fetch(`${WEB_APP_URL}?action=chamar&senha=${encodeURIComponent(senhaSelecionada)}&maquina=${encodeURIComponent(maquina)}&nome=${encodeURIComponent(nome)}&idade=${encodeURIComponent(idade)}&especialidade=${encodeURIComponent(especialidade)}&cor=${encodeURIComponent(cor)}&observacao=${encodeURIComponent(observacao)}`);
         const result = await resp.json();
         if (result.success) {
             mostrarMensagem("Dados salvos com sucesso!");
-            finalizarBtn.disabled = false; // Habilita o botão Finalizar
+            finalizarBtn.disabled = false;
         } else {
             alert("Erro ao salvar dados: " + result.message);
         }
@@ -148,14 +143,9 @@ async function salvarDados() {
 }
 
 async function finalizarTriagemModal() {
-    const maquina =
-        localStorage.getItem("maquinaSelecionada") || "Classificação 01";
+    const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
     try {
-        const resp = await fetch(
-            `${WEB_APP_URL}?action=finalizarTriagem&senha=${encodeURIComponent(
-        senhaSelecionada
-      )}`
-        );
+        const resp = await fetch(`${WEB_APP_URL}?action=finalizarTriagem&senha=${encodeURIComponent(senhaSelecionada)}`);
         const result = await resp.json();
         if (result.success) {
             mostrarMensagem("Classificação finalizada.");
@@ -170,14 +160,9 @@ async function finalizarTriagemModal() {
 }
 
 async function finalizarTriagem(senha) {
-    const maquina =
-        localStorage.getItem("maquinaSelecionada") || "Classificação 01";
+    const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
     try {
-        const resp = await fetch(
-            `${WEB_APP_URL}?action=finalizarTriagem&senha=${encodeURIComponent(
-        senha
-      )}`
-        );
+        const resp = await fetch(`${WEB_APP_URL}?action=finalizarTriagem&senha=${encodeURIComponent(senha)}`);
         const result = await resp.json();
         if (result.success) {
             mostrarMensagem("Classificação finalizada.");
@@ -196,8 +181,7 @@ async function excluirSenha(senha) {
         const resp = await fetch(`${WEB_APP_URL}?action=excluir&senha=${senha}`);
         const result = await resp.json();
         if (result.success) {
-            const maquina =
-                localStorage.getItem("maquinaSelecionada") || "Classificação 01";
+            const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
             carregarSenhas(maquina);
         } else {
             alert("Erro ao excluir senha: " + result.message);
@@ -208,8 +192,7 @@ async function excluirSenha(senha) {
 }
 
 function iniciarAtualizacaoAutomatica() {
-    const maquina =
-        localStorage.getItem("maquinaSelecionada") || "Classificação 01";
+    const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
     carregarSenhas(maquina);
     setInterval(() => carregarSenhas(maquina), POLLING_INTERVAL);
 }
@@ -218,11 +201,9 @@ btnEngrenagem.addEventListener("click", () => {
     modalMaquina.classList.add("show");
     const maquinaSalva = localStorage.getItem("maquinaSelecionada");
     if (maquinaSalva) {
-        document
-            .querySelectorAll("input[name='classificacao']")
-            .forEach((radio) => {
-                radio.checked = radio.value === maquinaSalva;
-            });
+        document.querySelectorAll("input[name='classificacao']").forEach((radio) => {
+            radio.checked = radio.value === maquinaSalva;
+        });
     }
 });
 
@@ -231,9 +212,7 @@ cancelarMaquinaBtn.addEventListener("click", () => {
 });
 
 salvarMaquinaBtn.addEventListener("click", () => {
-    const selecionado = document.querySelector(
-        "input[name='classificacao']:checked"
-    );
+    const selecionado = document.querySelector("input[name='classificacao']:checked");
     if (!selecionado) {
         alert("Selecione uma máquina.");
         return;
@@ -246,8 +225,7 @@ salvarMaquinaBtn.addEventListener("click", () => {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-    const maquina =
-        localStorage.getItem("maquinaSelecionada") || "Classificação 01";
+    const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
     spanMaquina.textContent = `(Máquina atual: ${maquina})`;
 
     window.abrirModal = abrirModal;
@@ -260,3 +238,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
     iniciarAtualizacaoAutomatica();
 });
+
+// ✅ NOVA FUNÇÃO: Registrar chamada na aba ChamadaTV
+async function chamarPaciente(botao) {
+    const senha = botao.dataset.senha;
+    const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
+
+    try {
+        const resp = await fetch(`${WEB_APP_URL}?action=registrarChamadaTV&senha=${encodeURIComponent(senha)}&maquina=${encodeURIComponent(maquina)}`);
+        const result = await resp.json();
+        if (result.success) {
+            mostrarMensagem("Chamada registrada com sucesso.");
+            botao.textContent = "Chamar Novamente";
+        } else {
+            alert("Erro ao registrar chamada: " + result.message);
+        }
+    } catch (err) {
+        alert("Erro na conexão: " + err.message);
+    }
+}

@@ -1,55 +1,49 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <title>Painel de Classificação de Risco</title>
     <link rel="stylesheet" href="style.css" />
-  </head>
+</head>
 
-  <body>
+<body>
     <h1>
-      Painel de Classificação de Risco
-      <button
-        id="btnEngrenagem"
-        title="Configurar Máquina"
-        style="font-size: 1.3rem; margin-left: 15px; cursor: pointer"
-      >
+        Painel de Classificação de Risco
+        <button id="btnEngrenagem" title="Configurar Máquina" style="font-size: 1.3rem; margin-left: 15px; cursor: pointer">
         ⚙️
       </button>
-      <span
-        id="spanMaquina"
-        style="font-size: 1rem; margin-left: 10px; color: #555"
-      ></span>
+        <span id="spanMaquina" style="font-size: 1rem; margin-left: 10px; color: #555"></span>
     </h1>
 
     <table id="senhaTable">
-      <thead>
-        <tr>
-          <th>Senha</th>
-          <th>Data/Hora</th>
-          <th>Status</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
+        <thead>
+            <tr>
+                <th>Senha</th>
+                <th>Data/Hora</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
     </table>
 
     <!-- Modal de preenchimento -->
     <div id="modal" class="modal">
-      <div id="modal-content">
-        <h2>Preencher Dados do Paciente</h2>
-        <form id="form">
-          <div class="form-group">
-            <label for="nome">Nome</label>
-            <input type="text" id="nome" required />
-          </div>
-          <div class="form-group">
-            <label for="idade">Idade</label>
-            <input type="number" id="idade" required />
-          </div>
-          <div class="form-group">
-            <label for="especialidade">Especialidade</label>
-            <select id="especialidade" required>
+        <div id="modal-content">
+            <h2>Preencher Dados do Paciente</h2>
+            <form id="form">
+                <div class="form-group">
+                    <label for="nome">Nome</label>
+                    <input type="text" id="nome" required />
+                </div>
+                <div class="form-group">
+                    <label for="idade">Idade</label>
+                    <input type="number" id="idade" required />
+                </div>
+                <div class="form-group">
+                    <label for="especialidade">Especialidade</label>
+                    <select id="especialidade" required>
               <option value="">Selecione...</option>
               <option value="Pediatria">Pediatria</option>
               <option value="Ortopedia">Ortopedia</option>
@@ -57,69 +51,62 @@
               <option value="Clínica Médica">Clínica Médica</option>
               <option value="Ginecologia">Ginecologia</option>
             </select>
-          </div>
-          <div class="form-group">
-            <label for="cor">Cor</label>
-            <select id="cor" required>
+                </div>
+                <div class="form-group">
+                    <label for="cor">Cor</label>
+                    <select id="cor" required>
               <option value="Vermelho">Vermelho</option>
               <option value="Amarelo">Amarelo</option>
               <option value="Verde">Verde</option>
               <option value="Azul">Azul</option>
             </select>
-          </div>
-          <div class="form-group">
-            <label for="observacao">Observação</label>
-            <input type="text" id="observacao" />
-          </div>
+                </div>
+                <div class="form-group">
+                    <label for="observacao">Observação</label>
+                    <input type="text" id="observacao" />
+                </div>
 
-          <div class="botoes-modal">
-            <button type="button" id="salvarBtn" class="btn-primario">
+                <div class="botoes-modal">
+                    <button type="button" id="salvarBtn" class="btn-primario">
               Salvar
             </button>
-            <button type="button" id="finalizarBtn" class="btn-aviso">
+                    <button type="button" id="finalizarBtn" class="btn-aviso" disabled>
               Finalizar Classificação
             </button>
-            <button type="button" id="cancelarBtn" class="btn-perigo">
+                    <button type="button" id="cancelarBtn" class="btn-perigo">
               Cancelar
             </button>
-          </div>
-        </form>
-      </div>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- Modal de seleção de máquina -->
     <div id="modalMaquina" class="modal">
-      <div id="modalMaquinaContent">
-        <h2>Selecionar Máquina</h2>
-        <form id="formMaquina">
-          <label
-            ><input
-              type="radio"
-              name="classificacao"
-              value="Classificação 01"
-            />
-            Classificação 01</label
-          >
-          <label
-            ><input
-              type="radio"
-              name="classificacao"
-              value="Classificação 02"
-            />
-            Classificação 02</label
-          >
-          <div style="margin-top: 15px">
-            <button type="button" id="salvarMaquinaBtn" class="btn-primario">
+        <div id="modalMaquinaContent">
+            <h2>Selecionar Máquina</h2>
+            <form id="formMaquina">
+                <label>
+            <input type="radio" name="classificacao" value="Classificação 01" />
+            Classificação 01
+          </label>
+                <label>
+            <input type="radio" name="classificacao" value="Classificação 02" />
+            Classificação 02
+          </label>
+                <div style="margin-top: 15px">
+                    <button type="button" id="salvarMaquinaBtn" class="btn-primario">
               Salvar
             </button>
-            <button type="button" id="cancelarMaquinaBtn" class="btn-perigo">
+                    <button type="button" id="cancelarMaquinaBtn" class="btn-perigo">
               Cancelar
             </button>
-          </div>
-        </form>
-      </div>
+                </div>
+            </form>
+        </div>
     </div>
 
     <script src="script.js" defer></script>
-  </body>
+</body>
+
 </html>
