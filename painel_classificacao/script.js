@@ -82,13 +82,16 @@ function render() {
 }
 
 async function carregarSenhas(maquina) {
-    try {
-        const resp = await fetch(`${WEB_APP_URL}?action=listar&maquina=${encodeURIComponent(maquina)}`);
-        senhas = await resp.json();
-        render();
-    } catch (err) {
-        alert("Erro ao carregar senhas: " + err.message);
-    }
+  try {
+    const resp = await fetch(`${WEB_APP_URL}?action=listar&maquina=${encodeURIComponent(maquina)}`);
+    if (!resp.ok) throw new Error("Resposta inválida do servidor");
+    
+    senhas = await resp.json();
+    render();
+  } catch (err) {
+    console.warn("Erro silencioso ao carregar senhas (vai tentar novamente no próximo ciclo):", err.message);
+    // Aqui não fazemos nada visual — ele tenta de novo automaticamente no próximo ciclo do setInterval
+  }
 }
 
 function abrirModal(senha) {
