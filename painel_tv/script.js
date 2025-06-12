@@ -1,6 +1,10 @@
-// ============================================================================
-// Painel TV (script.js) teste teste
-// ============================================================================
+/**
+ * Sistema de Gestão de Atendimento
+ * Desenvolvido por Igor M. Kurahayachi
+ * Analista de Sistemas - Rede Santa Catarina
+ * Todos os direitos reservados.
+ * Uso interno permitido mediante autorização do autor.
+ */
 
 // URL do seu Web App (Apps Script) que já implementa `action=chamadas`
 const WEB_APP_URL =
@@ -40,9 +44,9 @@ function atualizarUI(chamadas) {
     const chamadaAtual = chamadas[0];
 
     // Só dispara modal se a senha mudou (nova chamada)
-    if (!ultimaChamada || chamadaAtual.senha !== ultimaChamada.senha) {
-        ultimaChamada = chamadaAtual;
-        mostrarModal(chamadaAtual);
+    if (!ultimaChamada || chamadaAtual.uuid !== ultimaChamada.uuid) {
+    ultimaChamada = chamadaAtual;
+    mostrarModal(chamadaAtual);
     }
 
     // Atualiza texto de "Última chamada"
@@ -52,12 +56,11 @@ function atualizarUI(chamadas) {
     // PREENCHE AGORA CADA COLUNA A PARTIR DO CAMPO 'setor', NÃO MAIS 'maquina'
     // Pegamos as 3 últimas chamadas cujo 'setor' inclua a palavra (ignorando maiúsculas/minúsculas)
     const classificacao = chamadas
-        .filter(
-            c =>
-            c.setor &&
-            c.setor.toLowerCase().includes("classifica")
-        )
-        .slice(0, 3);
+  .filter(
+    c => c.setor && c.setor.toLowerCase().includes("classifica")
+  )
+  .slice(0, 5); // ← mantenha isso apenas se quiser limitar a 3 visualmente
+
 
     const recepcao = chamadas
         .filter(
@@ -126,12 +129,17 @@ function mostrarModal(chamada) {
 async function carregarChamadas() {
     try {
         const resp = await fetch(`${WEB_APP_URL}?action=chamadas`);
+
+        if (!resp.ok) throw new Error("Resposta inválida do servidor");
+
         const dados = await resp.json();
         atualizarUI(dados);
     } catch (e) {
-        console.error("Erro ao buscar chamadas:", e);
+        // Silencia o erro para não interromper a UX do painel TV
+        console.warn("Falha temporária ao buscar chamadas. Tentando novamente no próximo ciclo...");
     }
 }
+
 
 // Ao carregar a página, inicia o polling e carrega imediatamente.
 document.addEventListener("DOMContentLoaded", () => {

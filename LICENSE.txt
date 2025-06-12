@@ -1,9 +1,5 @@
 Copyright (c) 2025 Igor M. Kurahayachi
-
 Este software é fornecido "no estado em que se encontra", exclusivamente para uso interno da Rede Santa Catarina, mediante autorização informal do autor.
-
 É proibido vender, redistribuir, modificar ou utilizar este software para fins comerciais sem o consentimento formal do autor.
-
 O autor não se responsabiliza por falhas, danos ou perdas causadas pelo uso indevido deste sistema.
-
-Contato: [seu e-mail ou LinkedIn]
+Contato: [igorkurahayachi@hotmail.com]
