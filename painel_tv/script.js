@@ -92,12 +92,19 @@ function atualizarUI(chamadas) {
  * c.senha e c.nome já estão disponíveis.
  */
 function preencherLista(elemento, dados) {
-    elemento.innerHTML = "";
-    dados.forEach(c => {
-        const li = document.createElement("li");
-        li.textContent = `${c.senha} – ${c.nome}`;
-        elemento.appendChild(li);
-    });
+  elemento.innerHTML = "";
+  dados.forEach(c => {
+    const li = document.createElement("li");
+
+    // Verifica se é a lista de CLASSIFICAÇÃO para incluir a máquina
+    if (elemento.id === "historicoClassificacao") {
+      li.textContent = `${c.senha} (${c.maquina})`;
+    } else {
+      li.textContent = `${c.senha} – ${c.nome}`;
+    }
+
+    elemento.appendChild(li);
+  });
 }
 
 /**
