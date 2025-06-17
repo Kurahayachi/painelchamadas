@@ -59,7 +59,7 @@ function atualizarUI(chamadas) {
   .filter(
     c => c.setor && c.setor.toLowerCase().includes("classifica")
   )
-  .slice(0, 5); // ← mantenha isso apenas se quiser limitar a 3 visualmente
+  .slice(0, 5); // ← mantenha isso apenas se quiser limitar a 5 visualmente
 
 
     const recepcao = chamadas
@@ -70,7 +70,7 @@ function atualizarUI(chamadas) {
                 c.setor.toLowerCase().includes("recep") ||
                 c.setor.toLowerCase().includes("guiche"))
         )
-        .slice(0, 3);
+        .slice(0, 5);
 
     const medico = chamadas
         .filter(
@@ -79,7 +79,7 @@ function atualizarUI(chamadas) {
             (c.setor.toLowerCase().includes("medic") ||
                 c.setor.toLowerCase().includes("consult"))
         )
-        .slice(0, 3);
+        .slice(0, 5);
 
     // Preenche cada lista (<ul>) com as senhas e nomes
     preencherLista(listaClassificacao, classificacao);
