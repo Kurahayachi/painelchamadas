@@ -183,3 +183,24 @@ button {
     opacity: 1;
   }
 }
+/* Rodapé fixo no final da tela */
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1;
+  overflow-y: auto;
+}
+
+footer {
+  text-align: center;
+  margin-top: 20px;
+  padding: 10px 0;
+  font-size: 0.85rem;
+  color: #777;
+  border-top: 1px solid #ccc;
+  background-color: #f9f9f9;
+}
