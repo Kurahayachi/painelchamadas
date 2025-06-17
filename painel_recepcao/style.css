@@ -122,6 +122,21 @@ button {
   z-index: 1001;
   text-align: center;
 }
+#modal-content {
+  max-width: 500px;
+  padding: 30px;
+}
+
+#modal-content h2 {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+}
+
+#modal-content p {
+  font-size: 1rem;
+  margin-bottom: 20px;
+  line-height: 1.4;
+}
 
 .form-group {
   margin-bottom: 15px;
