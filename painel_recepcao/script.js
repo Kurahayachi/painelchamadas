@@ -1,166 +1,179 @@
-const WEB_APP_URL =
-    "https://script.google.com/macros/s/AKfycbyiKkNeQFdXwJukv8MRCGm6lm8mMf06aaBZX-8yBaqA8Rp84QxTb1venFcRptzsgCve-w/exec";
+/**
+ * Sistema de Gestão de Atendimento
+ * Desenvolvido por Igor M. Kurahayachi
+ * Analista de Sistemas - Rede Santa Catarina
+ * Todos os direitos reservados.
+ * Uso interno permitido mediante autorização do autor.
+ */
 
-// Auto-reload a cada 15 minutos para amnter a sessão ativa
-setInterval(() => {
-    console.log("⏳ 5 minutos se passaram, recarregando o painel de médico...");
-    location.reload();
-}, 15 * 60 * 1000);
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyHWBjH0V511TkqGWyJKZytHXhbxWtXLNhdgKnap926pnUiYnzW0o5Ml94PHpGC33H_ag/exec";
 
 let senhas = [];
+let senhaSelecionada = "";
+
 const tbody = document.querySelector("#senhaTable tbody");
 const POLLING_INTERVAL = 5000;
+ 
+const notificador = document.createElement("div");
+notificador.id = "notificador"; 
+document.body.appendChild(notificador);
 
-// Modal máquina
+function mostrarMensagem(texto) {
+  notificador.textContent = texto;
+  notificador.style.display = "block";
+  setTimeout(() => {
+    notificador.style.display = "none";
+  }, 3000);
+}
+ 
+function render() {
+  tbody.innerHTML = "";
+  senhas.forEach(({ senha, data, nome, status }) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${senha}</td>
+      <td>${new Date(data).toLocaleString()}</td>
+      <td>${nome}</td>
+      <td>${status}</td>
+      <td>
+        <button class="btn-primario chamarBtn" data-senha="${senha}">Chamar</button>
+        <button class="btn-finalizar finalizarBtn" data-senha="${senha}">Finalizar</button>
+        <button class="btn-perigo excluirBtn" data-senha="${senha}">Excluir</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  document.querySelectorAll(".chamarBtn").forEach(btn => {
+    btn.addEventListener("click", () => chamarPaciente(btn.dataset.senha));
+  });
+
+  document.querySelectorAll(".finalizarBtn").forEach(btn => {
+    btn.addEventListener("click", () => abrirModalConfirmar(btn.dataset.senha));
+  });
+
+  document.querySelectorAll(".excluirBtn").forEach(btn => {
+    btn.addEventListener("click", () => excluirSenha(btn.dataset.senha));
+  });
+}
+ 
+async function carregarSenhas(maquina) {
+  try {
+    const resp = await fetch(`${WEB_APP_URL}?action=listar&maquina=${encodeURIComponent(maquina)}`);
+    if (!resp.ok) throw new Error("Resposta inválida");
+    senhas = await resp.json();
+    render();
+  } catch (err) {
+    console.warn("Erro ao carregar senhas (silenciado):", err.message);
+  }
+}
+ 
+async function chamarPaciente(senha) {
+  const maquina = localStorage.getItem("maquinaSelecionada") || "Recepção 01";
+  try {
+    const resp = await fetch(`${WEB_APP_URL}?action=registrarChamadaTV&senha=${encodeURIComponent(senha)}&maquina=${encodeURIComponent(maquina)}`);
+    const result = await resp.json();
+    if (result.success) {
+      mostrarMensagem("Chamada registrada com sucesso.");
+    } else {
+      alert("Erro ao chamar: " + result.message);
+    }
+  } catch (err) {
+    alert("Erro na conexão: " + err.message);
+  }
+}
+
+let senhaConfirmar = "";
+
+function abrirModalConfirmar(senha) {
+  senhaConfirmar = senha;
+  document.getElementById("senhaConfirmar").textContent = senha;
+  document.getElementById("modalConfirmar").classList.add("show");
+}
+
+async function finalizarSenha() {
+  const maquina = localStorage.getItem("maquinaSelecionada") || "Recepção 01";
+  try {
+    const resp = await fetch(`${WEB_APP_URL}?action=liberar&senha=${encodeURIComponent(senhaConfirmar)}&maquina=${encodeURIComponent(maquina)}`);
+    const result = await resp.json();
+    if (result.success) {
+      mostrarMensagem("Atendimento finalizado.");
+      carregarSenhas(maquina);
+      fecharModalConfirmar();
+    } else {
+      alert("Erro ao finalizar: " + result.message);
+    }
+  } catch (err) {
+    alert("Erro na conexão: " + err.message);
+  }
+}
+
+function fecharModalConfirmar() {
+  document.getElementById("modalConfirmar").classList.remove("show");
+}
+
+async function excluirSenha(senha) {
+  if (!confirm(`Tem certeza que deseja excluir a senha ${senha}?`)) return;
+  try {
+    const resp = await fetch(`${WEB_APP_URL}?action=excluir&senha=${senha}`);
+    const result = await resp.json();
+    if (result.success) {
+      const maquina = localStorage.getItem("maquinaSelecionada") || "Recepção 01";
+      carregarSenhas(maquina);
+    } else {
+      alert("Erro ao excluir: " + result.message);
+    }
+  } catch (err) {
+    alert("Erro na conexão: " + err.message);
+  }
+}
+
+function iniciarAtualizacaoAutomatica() {
+  const maquina = localStorage.getItem("maquinaSelecionada") || "Recepção 01";
+  carregarSenhas(maquina);
+  setInterval(() => carregarSenhas(maquina), POLLING_INTERVAL);
+}
+
 const modalMaquina = document.getElementById("modalMaquina");
 const btnEngrenagem = document.getElementById("btnEngrenagem");
 const salvarMaquinaBtn = document.getElementById("salvarMaquinaBtn");
 const cancelarMaquinaBtn = document.getElementById("cancelarMaquinaBtn");
 const spanMaquina = document.getElementById("spanMaquina");
 
-// Notificador de topo
-const notificador = document.createElement("div");
-notificador.id = "notificador";
-notificador.style.position = "fixed";
-notificador.style.top = "15px";
-notificador.style.left = "50%";
-notificador.style.transform = "translateX(-50%)";
-notificador.style.background = "#38c172";
-notificador.style.color = "white";
-notificador.style.padding = "10px 20px";
-notificador.style.borderRadius = "5px";
-notificador.style.display = "none";
-notificador.style.zIndex = "9999";
-document.body.appendChild(notificador);
-
-function mostrarMensagem(texto) {
-    notificador.textContent = texto;
-    notificador.style.display = "block";
-    setTimeout(() => {
-        notificador.style.display = "none";
-    }, 3000);
-}
-
-// Renderiza a tabela com base nas senhas
-function render() {
-    tbody.innerHTML = "";
-    senhas.forEach(({ senha, data, status }) => {
-        const tr = document.createElement("tr");
-        const botoes = `
-      <button class="btn-primario" onclick="chamarPaciente('${senha}')">Chamar</button>
-      <button class="btn-liberar" onclick="liberarPaciente('${senha}')">Liberar</button>
-      <button class="btn-perigo" onclick="excluirSenha('${senha}')">Excluir</button>
-    `;
-        tr.innerHTML = `
-      <td>${senha}</td>
-      <td>${new Date(data).toLocaleString()}</td>
-      <td>${status}</td>
-      <td>${botoes}</td>
-    `;
-        tbody.appendChild(tr);
-    });
-}
-
-// Carrega senhas com status "Aguardando Recepção"
-async function carregarSenhas(maquina) {
-    try {
-        // O Apps Script espera action=listar para chamar listarSenhasRecepcao()
-        const resp = await fetch(
-            `${WEB_APP_URL}?action=listar&maquina=${encodeURIComponent(maquina)}`
-        );
-        senhas = await resp.json();
-        render();
-    } catch (err) {
-        alert("Erro ao carregar senhas: " + err.message);
-    }
-}
-
-// Ação de chamar paciente (exibição simples)
-async function chamarPaciente(senha) {
-    mostrarMensagem(`Paciente ${senha} chamado.`);
-}
-
-// Libera o paciente para o médico (muda status para "Aguardando Médico")
-async function liberarPaciente(senha) {
-    try {
-        const resp = await fetch(
-            `${WEB_APP_URL}?action=liberar&senha=${encodeURIComponent(senha)}`
-        );
-        const result = await resp.json();
-        if (result.success) {
-            mostrarMensagem("Paciente liberado para o médico.");
-            const maquina = localStorage.getItem("maquinaSelecionada") || "Recepção 01";
-            carregarSenhas(maquina);
-        } else {
-            alert("Erro ao liberar: " + result.message);
-        }
-    } catch (err) {
-        alert("Erro de conexão: " + err.message);
-    }
-}
-
-// Exclui paciente da recepção
-async function excluirSenha(senha) {
-    if (!confirm(`Tem certeza que deseja excluir a senha ${senha}?`)) return;
-    try {
-        const resp = await fetch(
-            `${WEB_APP_URL}?action=excluir&senha=${encodeURIComponent(senha)}`
-        );
-        const result = await resp.json();
-        if (result.success) {
-            const maquina = localStorage.getItem("maquinaSelecionada") || "Recepção 01";
-            carregarSenhas(maquina);
-        } else {
-            alert("Erro ao excluir: " + result.message);
-        }
-    } catch (err) {
-        alert("Erro ao excluir: " + err.message);
-    }
-}
-
-// Atualização automática
-function iniciarAtualizacao() {
-    const maquina = localStorage.getItem("maquinaSelecionada") || "Recepção 01";
-    carregarSenhas(maquina);
-    setInterval(() => carregarSenhas(maquina), POLLING_INTERVAL);
-}
-
-// Engrenagem
 btnEngrenagem.addEventListener("click", () => {
-    modalMaquina.classList.add("show");
-    const maquinaSalva = localStorage.getItem("maquinaSelecionada");
-    if (maquinaSalva) {
-        document.querySelectorAll("input[name='recepcao']").forEach((radio) => {
-            radio.checked = radio.value === maquinaSalva;
-        });
-    }
+  modalMaquina.classList.add("show");
+  const maquinaSalva = localStorage.getItem("maquinaSelecionada");
+  if (maquinaSalva) {
+    document.querySelectorAll("input[name='recepcao']").forEach(radio => {
+      radio.checked = radio.value === maquinaSalva;
+    });
+  }
 });
 
 cancelarMaquinaBtn.addEventListener("click", () => {
-    modalMaquina.classList.remove("show");
+  modalMaquina.classList.remove("show");
 });
 
 salvarMaquinaBtn.addEventListener("click", () => {
-    const selecionado = document.querySelector("input[name='recepcao']:checked");
-    if (!selecionado) {
-        alert("Selecione uma máquina.");
-        return;
-    }
-    const maquina = selecionado.value;
-    localStorage.setItem("maquinaSelecionada", maquina);
-    spanMaquina.textContent = `(Máquina atual: ${maquina})`;
-    modalMaquina.classList.remove("show");
-    carregarSenhas(maquina);
+  const selecionado = document.querySelector("input[name='recepcao']:checked");
+  if (!selecionado) {
+    alert("Selecione uma máquina.");
+    return;
+  }
+  const maquina = selecionado.value;
+  localStorage.setItem("maquinaSelecionada", maquina);
+  spanMaquina.textContent = `(Máquina atual: ${maquina})`;
+  modalMaquina.classList.remove("show");
+  carregarSenhas(maquina);
 });
 
-// Inicialização
+
 document.addEventListener("DOMContentLoaded", () => {
-    const maquina = localStorage.getItem("maquinaSelecionada") || "Recepção 01";
-    spanMaquina.textContent = `(Máquina atual: ${maquina})`;
+  const maquina = localStorage.getItem("maquinaSelecionada") || "Recepção 01";
+  spanMaquina.textContent = `(Máquina atual: ${maquina})`;
 
-    window.chamarPaciente = chamarPaciente;
-    window.liberarPaciente = liberarPaciente;
-    window.excluirSenha = excluirSenha;
+  document.getElementById("btnCancelarConfirmar").addEventListener("click", fecharModalConfirmar);
+  document.getElementById("btnConfirmarFinalizar").addEventListener("click", finalizarSenha);
 
-    iniciarAtualizacao();
+  iniciarAtualizacaoAutomatica();
 });

@@ -1,25 +1,23 @@
+<!--
+ * Sistema de Gestão de Atendimento
+ * Desenvolvido por Igor M. Kurahayachi
+ * Analista de Sistemas - Rede Santa Catarina
+ * Todos os direitos reservados.
+ * Uso interno permitido mediante autorização do autor.
+-->
+
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Painel Recepção</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-
-  <body>
-    <h1>
-      Painel Recepção
-      <button
-        id="btnEngrenagem"
-        title="Selecionar Máquina"
-        style="font-size: 1.3rem; margin-left: 15px; cursor: pointer"
-      >
-        ⚙️
-      </button>
-      <span
-        id="spanMaquina"
-        style="font-size: 1rem; margin-left: 10px; color: #555"
-      ></span>
+<head>
+  <meta charset="UTF-8">
+  <title>Painel Recepção</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <h1>Painel Recepção
+      <button id="btnEngrenagem" title="Configurar Máquina" style="font-size: 1.3rem; margin-left: 15px; cursor: pointer">⚙️</button>
+      <span id="spanMaquina" style="font-size: 1rem; margin-left: 10px; color: #555"></span>
     </h1>
 
     <table id="senhaTable">
@@ -27,46 +25,46 @@
         <tr>
           <th>Senha</th>
           <th>Data/Hora</th>
+          <th>Nome do Paciente</th>
           <th>Status</th>
           <th>Ações</th>
         </tr>
       </thead>
       <tbody></tbody>
     </table>
+  </main>
 
-    <!-- Modal para seleção de máquina  -->
-    <div id="modalMaquina" class="modal">
-      <div id="modalMaquinaContent">
-        <h2>Selecionar Máquina</h2>
-        <form id="formMaquina">
-          <label
-            ><input type="radio" name="recepcao" value="Recepção 01" /> Recepção
-            01</label
-          >
-          <label
-            ><input type="radio" name="recepcao" value="Recepção 02" /> Recepção
-            02</label
-          >
-          <label
-            ><input type="radio" name="recepcao" value="Recepção 03" /> Recepção
-            03</label
-          >
-          <label
-            ><input type="radio" name="recepcao" value="Recepção 04" /> Recepção
-            04</label
-          >
-          <div style="margin-top: 15px">
-            <button type="button" id="salvarMaquinaBtn" class="btn-primario">
-              Salvar
-            </button>
-            <button type="button" id="cancelarMaquinaBtn" class="btn-perigo">
-              Cancelar
-            </button>
-          </div>
-        </form>
-      </div>
+  <!-- Modal de Confirmação Finalizar -->
+  <div id="modalConfirmar" class="modal">
+    <div id="modal-content">
+      <h2>Finalizar Atendimento</h2>
+      <p>Tem certeza que deseja finalizar o atendimento da recepção para a senha <span id="senhaConfirmar"></span>?</p>
+      <button id="btnConfirmarFinalizar" class="btn-aviso">Sim, Finalizar</button>
+      <button id="btnCancelarConfirmar" class="btn-perigo">Cancelar</button>
     </div>
+  </div>
 
-    <script src="script.js" defer></script>
-  </body>
+  <!-- Modal de seleção de máquina -->
+  <div id="modalMaquina" class="modal">
+    <div id="modalMaquinaContent">
+      <h2>Selecionar Máquina</h2>
+      <form id="formMaquina">
+        <label><input type="radio" name="recepcao" value="Recepção 01"> Recepção 01</label>
+        <label><input type="radio" name="recepcao" value="Recepção 02"> Recepção 02</label>
+        <label><input type="radio" name="recepcao" value="Recepção 03"> Recepção 03</label>
+        <label><input type="radio" name="recepcao" value="Recepção 04"> Recepção 04</label>
+        <div style="margin-top: 15px">
+          <button type="button" id="salvarMaquinaBtn" class="btn-primario">Salvar</button>
+          <button type="button" id="cancelarMaquinaBtn" class="btn-perigo">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer style="text-align: center; margin-top: 40px; padding-top: 15px; font-size: 0.85rem; color: #777; border-top: 1px solid #ccc;">
+    Sistema desenvolvido por Igor M. Kurahayachi · © 2025 Todos os direitos reservados.
+  </footer>
+
+  <script src="script.js" defer></script>
+</body>
 </html>
