@@ -1,5 +1,5 @@
 const WEB_APP_URL =
-    "https://script.google.com/macros/s/AKfycbxismeV4ufjPbtKZA4dBYS2M0A69r_EbZ8WuVn8WM-y0WPlCT2GabPsK8GWhfwyCHDJ/exec";
+    "https://script.google.com/macros/s/AKfycbwW18MqCt-LE1aTRetUZlUb4fBucreEqAmuZHPUWPjiFpY7f7TtkEh6OQbwTQ42eFoD/exec";
 
 // Auto-reload a cada 15 minutos para amnter a sessão ativa
 setInterval(() => {
@@ -20,6 +20,32 @@ const cancelarMaquinaBtn = document.getElementById("cancelarMaquinaBtn");
 const btnFiltro = document.getElementById("btnFiltroEspecialidade");
 const filtroEspecialidades = document.getElementById("filtroEspecialidades");
 const selectAll = document.getElementById("selectAll");
+// Cria o elemento visual do notificador (a caixinha de mensagem que aparece no topo da tela)
+const notificador = document.createElement("div");
+notificador.id = "notificador";
+// Define o estilo visual da caixinha (posição, cor, fonte, sombra, etc)
+notificador.style.position = "fixed";
+notificador.style.top = "15px";
+notificador.style.left = "50%";
+notificador.style.transform = "translateX(-50%)";
+notificador.style.background = "#38c172";
+notificador.style.color = "white";
+notificador.style.padding = "10px 20px";
+notificador.style.borderRadius = "5px";
+notificador.style.display = "none";
+notificador.style.zIndex = "9999";
+notificador.style.fontWeight = "bold";
+notificador.style.boxShadow = "0 2px 6px rgba(0, 0, 0, 0.2)";
+// Adiciona o elemento criado dentro do body da página
+document.body.appendChild(notificador);
+// Função para exibir o notificador com o texto desejado e sumir sozinho depois de 3 segundos
+function mostrarMensagem(texto) {
+  notificador.textContent = texto;
+  notificador.style.display = "block";
+  setTimeout(() => {
+    notificador.style.display = "none";
+  }, 3000);
+}
 
 btnEngrenagem.addEventListener("click", () => {
     modalMaquina.classList.add("show");
@@ -97,61 +123,95 @@ function render() {
         <td>${especialidade}</td>
         <td><span class="cor-bolinha ${corClasse}"></span></td>
         <td>
-          <button class="btn-primario" onclick="chamarPaciente('${senha}')">Chamar</button>
-          <button class="btn-finalizar" onclick="liberarPaciente('${senha}')">Liberar</button>
+        <button class="btn-primario" onclick="chamarPaciente('${senha}')">📣 Chamar</button>
+        <button class="btn-finalizar" onclick="abrirModalConfirmar('${senha}')">Finalizar</button>
         </td>
+
       `;
 
             tbody.appendChild(tr);
         });
 }
 
-function chamarPaciente(senha) {
-    alert(`Chamando paciente: ${senha}`);
+async function chamarPaciente(senha) {
+  if (!consultorioSelecionado) {
+    alert("Você precisa selecionar um consultório.");
+    return;
+  }
+
+  try {
+    const resp = await fetch(`${WEB_APP_URL}?action=registrarChamadaTV&senha=${encodeURIComponent(senha)}&consultorio=${encodeURIComponent(consultorioSelecionado)}`);
+    const result = await resp.json();
+    if (result.success) {
+      mostrarMensagem("Paciente chamado com sucesso.");
+    } else {
+      alert("Erro ao chamar: " + result.message);
+    }
+  } catch (err) {
+    console.warn("Erro ao chamar:", err);
+  }
 }
+function abrirModalConfirmar(senha) {
+  senhaSelecionada = senha;
+  document.getElementById("senhaConfirmar").textContent = senha;
+  document.getElementById("modalConfirmar").classList.add("show");
+}
+async function finalizarTriagemModal() {
+  if (!consultorioSelecionado) {
+    alert("Você precisa selecionar um consultório.");
+    return;
+  }
 
-async function liberarPaciente(senha) {
-    if (!consultorioSelecionado) {
-        alert("Você precisa selecionar um consultório.");
-        return;
+  try {
+    const resp = await fetch(
+      `${WEB_APP_URL}?action=liberar&senha=${encodeURIComponent(senhaSelecionada)}&consultorio=${encodeURIComponent(consultorioSelecionado)}`
+    );
+    const result = await resp.json();
+    if (result.success) {
+      mostrarMensagem("Atendimento finalizado com sucesso.");
+      document.getElementById("modalConfirmar").classList.remove("show");
+      carregarSenhas();
+    } else {
+      alert("Erro ao finalizar: " + result.message);
     }
-
-    try {
-        const resp = await fetch(
-            `${WEB_APP_URL}?action=liberar&senha=${encodeURIComponent(
-        senha
-      )}&consultorio=${encodeURIComponent(consultorioSelecionado)}`
-        );
-        const result = await resp.json();
-        if (result.success) {
-            carregarSenhas();
-        } else {
-            alert("Erro ao liberar: " + result.message);
-        }
-    } catch (err) {
-        alert("Erro de conexão: " + err.message);
-    }
+  } catch (err) {
+    console.warn("Erro ao finalizar:", err);
+  }
 }
 
 async function carregarSenhas() {
-    try {
-        const resp = await fetch(`${WEB_APP_URL}?action=listar`);
-        senhas = await resp.json();
-        render();
-    } catch (err) {
-        alert("Erro ao carregar senhas: " + err.message);
-    }
+  try {
+    const resp = await fetch(`${WEB_APP_URL}?action=listar`);
+    if (!resp.ok) throw new Error("Falha ao buscar dados");
+    senhas = await resp.json();
+    render();
+  } catch (err) {
+    console.warn("Erro ao carregar senhas:", err);
+  }
 }
+window.addEventListener("load", async () => {
+  consultorioSelecionado = localStorage.getItem("consultorioSelecionado") || "";
+  if (consultorioSelecionado) {
+    spanMaquina.textContent = `(Consultório atual: ${consultorioSelecionado})`;
+  }
 
-document.addEventListener("DOMContentLoaded", () => {
-    consultorioSelecionado = localStorage.getItem("consultorioSelecionado") || "";
-    if (consultorioSelecionado) {
-        spanMaquina.textContent = `(Consultório atual: ${consultorioSelecionado})`;
-    }
+  window.chamarPaciente = chamarPaciente;
+  window.abrirModalConfirmar = abrirModalConfirmar;
 
-    window.chamarPaciente = chamarPaciente;
-    window.liberarPaciente = liberarPaciente;
+  document.getElementById("btnCancelarConfirmar").addEventListener("click", () => {
+    document.getElementById("modalConfirmar").classList.remove("show");
+  });
 
-    carregarSenhas();
+  document.getElementById("btnConfirmarFinalizar").addEventListener("click", () => {
+    finalizarTriagemModal();
+  });
+
+  try {
+    await carregarSenhas();
     setInterval(carregarSenhas, 5000);
+  } catch (error) {
+    console.warn("Erro inicial:", error);
+  }
 });
+
+

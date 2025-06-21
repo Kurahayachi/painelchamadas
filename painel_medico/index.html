@@ -6,6 +6,8 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
+    
+    <main>
     <h1>
       Painel Médico
       <button
@@ -139,7 +141,15 @@
         </form>
       </div>
     </div>
-
+      <!-- Modal de Confirmação Finalizar -->
+  <div id="modalConfirmar" class="modal">
+    <div id="modal-content">
+      <h2>Confirmar Finalização</h2>
+      <p>Tem certeza que deseja FINALIZAR o atendimento da senha <span id="senhaConfirmar"></span>?</p>
+      <button id="btnConfirmarFinalizar" class="btn-aviso">Sim, Finalizar</button>
+      <button id="btnCancelarConfirmar" class="btn-perigo">Cancelar</button>
+    </div>
+  </div>
     <!-- Tabela de pacientes -->
     <table id="senhaTable">
       <thead>
@@ -156,7 +166,11 @@
       </thead>
       <tbody></tbody>
     </table>
-
-    <script src="script.js" defer></script>
-  </body>
+  </main>
+  <footer style="text-align: center; margin-top: 40px; padding-top: 15px; font-size: 0.85rem; color: #777; border-top: 1px solid #ccc;">
+    Sistema desenvolvido por Igor M. Kurahayachi · © 2025 Todos os direitos reservados.
+  </footer>
+  <script src="script.js" defer></script>
+</body>
 </html>
+

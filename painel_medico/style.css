@@ -1,26 +1,31 @@
+/* Reset geral para evitar margens e paddings inesperados */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* Estilo base do corpo da página */
 body {
   font-family: Arial, sans-serif;
   padding: 20px;
   background: #f9f9f9;
 }
 
+/* Título da página */
 h1 {
   color: #333;
   margin-bottom: 10px;
 }
 
+/* Configuração da tabela */
 table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
 }
 
+/* Estilo de cabeçalhos e células da tabela */
 th,
 td {
   padding: 12px;
@@ -29,6 +34,7 @@ td {
   font-size: 0.95rem;
 }
 
+/* Estilo base de todos os botões */
 button {
   padding: 6px 12px;
   cursor: pointer;
@@ -39,14 +45,15 @@ button {
   transition: background-color 0.2s;
 }
 
-/* Botões padrão */
+/* Botão azul (Ações principais: Chamar, Salvar) */
 .btn-primario {
-  background-color: #3490dc;
+  background-color: #6f42c1;
 }
 .btn-primario:hover {
-  background-color: #2779bd;
+  background-color: #5936a1;
 }
 
+/* Botão vermelho (Cancelar, Excluir) */
 .btn-perigo {
   background-color: #e3342f;
 }
@@ -54,6 +61,7 @@ button {
   background-color: #cc1f1a;
 }
 
+/* Botão verde (Finalizar) */
 .btn-finalizar {
   background-color: #38c172;
 }
@@ -61,6 +69,7 @@ button {
   background-color: #2f9e60;
 }
 
+/* Botão amarelo (Alerta, Confirmação) */
 .btn-aviso {
   background-color: #f1c40f;
   color: #000;
@@ -69,20 +78,25 @@ button {
   background-color: #d4ac0d;
 }
 
-/* Botões ícones (⚙️, 🩺) sem fundo */
+/* Estilo para os botões de ícone (engrenagem, estetoscópio) */
 .icone-btn {
-  background: transparent;
-  border: none;
+  background-color: #f1f1f1;
+  border: 1px solid #ccc;
   font-size: 1.3rem;
   margin-left: 10px;
   cursor: pointer;
   color: #333;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: background-color 0.2s, box-shadow 0.2s, transform 0.2s;
 }
 .icone-btn:hover {
-  transform: scale(1.1);
+  background-color: #e2e2e2;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transform: scale(1.05);
 }
 
-/* Modal geral */
+/* Modal (fundo escuro e centralização) */
 .modal {
   display: none;
   position: fixed;
@@ -95,23 +109,25 @@ button {
   align-items: center;
   z-index: 1000;
 }
-
 .modal.show {
   display: flex;
   animation: fadeIn 0.3s ease-out;
 }
 
-/* Conteúdo dos modais */
+/* Conteúdo interno dos modais */
 #modalMaquinaContent,
-#modalFiltroContent {
+#modalFiltroContent,
+#modal-content {
   background: #fff;
   padding: 20px;
   border-radius: 8px;
-  width: 400px;
+  width: 500px;
+  max-width: 90%;
   z-index: 1001;
+  text-align: center;
 }
 
-/* Labels */
+/* Labels de rádio e checkboxes dentro dos modais */
 #formMaquina label,
 #modalFiltroContent label {
   display: flex;
@@ -121,21 +137,20 @@ button {
   gap: 8px;
 }
 
-/* Botões dos modais */
+/* Container de botões no modal */
 .botoes-modal {
   display: flex;
   justify-content: space-between;
   margin-top: 20px;
 }
 
-/* Bolinhas de cor */
+/* Bolinhas coloridas (Classificação de risco) */
 .cor-bolinha {
   width: 16px;
   height: 16px;
   border-radius: 50%;
   display: inline-block;
 }
-
 .cor-Vermelho {
   background: red;
 }
@@ -149,7 +164,7 @@ button {
   background: blue;
 }
 
-/* Animação */
+/* Animação de fadeIn para os modais */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -157,4 +172,35 @@ button {
   to {
     opacity: 1;
   }
+}
+
+/* Título do modal de confirmação */
+#modal-content h2 {
+  margin-bottom: 10px;
+  font-size: 1.4rem;
+}
+
+/* Texto do corpo do modal de confirmação */
+#modal-content p {
+  margin-bottom: 20px;
+  font-size: 1rem;
+}
+
+/* Espaçamento dos botões dentro do modal de confirmação */
+#modal-content button {
+  margin: 0 5px;
+}
+
+/* Faz o layout ocupar 100% da tela para garantir que o footer fique no rodapé */
+html, body {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Faz a área principal (main) empurrar o footer para baixo */
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }

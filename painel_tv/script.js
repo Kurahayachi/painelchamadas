@@ -54,7 +54,7 @@ function atualizarUI(chamadas) {
     ultimaNomeElem.textContent = chamadaAtual.nome;
 
     // PREENCHE AGORA CADA COLUNA A PARTIR DO CAMPO 'setor', NÃO MAIS 'maquina'
-    // Pegamos as 3 últimas chamadas cujo 'setor' inclua a palavra (ignorando maiúsculas/minúsculas)
+    // Pegamos as 5 últimas chamadas cujo 'setor' inclua a palavra (ignorando maiúsculas/minúsculas)
     const classificacao = chamadas
   .filter(
     c => c.setor && c.setor.toLowerCase().includes("classifica")
@@ -72,14 +72,18 @@ function atualizarUI(chamadas) {
         )
         .slice(0, 5);
 
-    const medico = chamadas
-        .filter(
-            c =>
+const medico = chamadas
+    .filter(
+        c =>
             c.setor &&
-            (c.setor.toLowerCase().includes("medic") ||
-                c.setor.toLowerCase().includes("consult"))
-        )
-        .slice(0, 5);
+            (
+              c.setor.toLowerCase().includes("medic") ||        // Inclui: Médico
+              c.setor.toLowerCase().includes("consult") ||      // Inclui: Consultório
+              c.setor.toLowerCase().includes("consultório")     // Inclui: Consultório escrito em português
+            )
+    )
+    .slice(0, 5);
+
 
     // Preenche cada lista (<ul>) com as senhas e nomes
     preencherLista(listaClassificacao, classificacao);
