@@ -164,4 +164,4 @@ setTimeout(() => {
     setTimeout(() => {
         location.reload();
     }, 1000);
-}, 1000 * 60 * 30); // Executa o reload a cada 30 minutos
+}, 1000 * 60 * 1); // Executa o reload a cada 30 minutos
