@@ -100,8 +100,11 @@ function preencherLista(elemento, dados) {
   dados.forEach(c => {
     const li = document.createElement("li");
 
-    // Verifica se é a lista de CLASSIFICAÇÃO para incluir a máquina
-    if (elemento.id === "historicoClassificacao") {
+    // Se for CLASSIFICAÇÃO ou MÉDICO, mostra a máquina
+    if (
+      elemento.id === "historicoClassificacao" ||
+      elemento.id === "historicoMedico"
+    ) {
       li.textContent = `${c.senha} (${c.maquina})`;
     } else {
       li.textContent = `${c.senha} – ${c.nome}`;
@@ -110,6 +113,7 @@ function preencherLista(elemento, dados) {
     elemento.appendChild(li);
   });
 }
+
 
 /**
  * Exibe o modal de destaque para a chamada atual.
