@@ -40,6 +40,21 @@ let ultimaChamada = null;
  *   }
  */
 /**
+ * Exibe os modais de forma sequencial, um por um, com intervalo de 12 segundos entre eles.
+ */
+function exibirModaisSequencial(chamadasPendentes, index = 0) {
+  if (index >= chamadasPendentes.length) return;
+
+  const chamada = chamadasPendentes[index];
+  mostrarModal(chamada);
+  marcarComoExibido(chamada.uuid);
+
+  // Aguarda 12 segundos antes de exibir o próximo
+  setTimeout(() => {
+    exibirModaisSequencial(chamadasPendentes, index + 1);
+  }, 12000);
+}
+/**
  * Atualiza a interface da TV com base nas chamadas recebidas do Apps Script.
  * Exibe o modal apenas para as chamadas que ainda não foram exibidas na TV (coluna G ≠ "Sim").
  * Atualiza o topo da tela com a última senha chamada.
@@ -47,14 +62,15 @@ let ultimaChamada = null;
 function atualizarUI(chamadas) {
   if (!chamadas || chamadas.length === 0) return;
 
-  // Percorre todas as chamadas recebidas (últimas 40 linhas)
-  chamadas.forEach((chamada) => {
-    // Só exibe o modal se a coluna "Exibido na TV" ainda estiver vazia ou diferente de "Sim"
-    if (!chamada.exibidoTV || chamada.exibidoTV.toLowerCase() !== "sim") {
-      mostrarModal(chamada);
-      marcarComoExibido(chamada.uuid); // Após exibir, marca como exibido na planilha
-    }
-  });
+  // Filtra apenas as chamadas que ainda não foram exibidas na TV
+  const chamadasPendentes = chamadas.filter(
+    c => !c.exibidoTV || c.exibidoTV.toLowerCase() !== "sim"
+  );
+
+  // Exibe os modais um por um, com intervalo entre eles
+  if (chamadasPendentes.length > 0) {
+    exibirModaisSequencial(chamadasPendentes);
+  }
 
   // Atualiza o campo da última senha e nome (topo da tela)
   const ultimaChamadaNaLista = chamadas[0];
