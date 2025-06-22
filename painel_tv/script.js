@@ -8,9 +8,7 @@
 
 // URL do seu Web App (Apps Script) que já implementa `action=chamadas`
 const WEB_APP_URL =
-    "https://script.google.com/macros/s/AKfycbyrgLyKJ1e7CxtPZqzgRgoN1RKRmdbzSfwxUMPFZmToHObfFH6BsCQEpoKW62oC5lXZ/exec";
-const WEB_APP_URL_MARCAR =
-    "https://script.google.com/macros/s/AKfycbyrgLyKJ1e7CxtPZqzgRgoN1RKRmdbzSfwxUMPFZmToHObfFH6BsCQEpoKW62oC5lXZ/exec";
+    "https://script.google.com/macros/s/AKfycbysDAxOUi6XxQmg_g7oG2xYM0-t2CjrGR36MM1yGq-0nM_kcTlo6NFvxRSpqwZ9YLUv/exec";
 
 // Elementos do DOM
 const ultimaSenhaElem = document.getElementById("ultimaSenha");
@@ -49,7 +47,7 @@ function exibirModaisSequencial(chamadasPendentes, index = 0) {
   mostrarModal(chamada);
   marcarComoExibido(chamada.uuid);
 
-  // Aguarda 12 segundos antes de exibir o próximo
+  
   setTimeout(() => {
     exibirModaisSequencial(chamadasPendentes, index + 1);
   }, 12000);
@@ -158,7 +156,7 @@ function mostrarModal(chamada) {
  * para marcar a linha como "Exibido na TV".
  */
 function marcarComoExibido(uuid) {
-  fetch(`${WEB_APP_URL_MARCAR}?action=marcarExibido&uuid=${encodeURIComponent(uuid)}`)
+  fetch(`${WEB_APP_URL}?action=marcarExibido&uuid=${encodeURIComponent(uuid)}`)
     .then(response => response.json())
     .then(data => {
       console.log(`UUID ${uuid} marcado como exibido na TV:`, data);
