@@ -8,9 +8,9 @@
 
 // URL do seu Web App (Apps Script) que já implementa `action=chamadas`
 const WEB_APP_URL =
-    "https://script.google.com/macros/s/AKfycbyo-DbtX6Cw1S-fi4_lZZqAPP-taNito-X2idV0liQCF_A1kTHkReR4r8aLrr7iXXf0/exec";
+    "https://script.google.com/macros/s/AKfycbyrgLyKJ1e7CxtPZqzgRgoN1RKRmdbzSfwxUMPFZmToHObfFH6BsCQEpoKW62oC5lXZ/exec";
 const WEB_APP_URL_MARCAR =
-    "https://script.google.com/macros/s/AKfycbyo-DbtX6Cw1S-fi4_lZZqAPP-taNito-X2idV0liQCF_A1kTHkReR4r8aLrr7iXXf0/exec";
+    "https://script.google.com/macros/s/AKfycbyrgLyKJ1e7CxtPZqzgRgoN1RKRmdbzSfwxUMPFZmToHObfFH6BsCQEpoKW62oC5lXZ/exec";
 
 // Elementos do DOM
 const ultimaSenhaElem = document.getElementById("ultimaSenha");
