@@ -90,7 +90,24 @@ button {
 .btn-aviso:hover {
   background-color: #d4ac0d;
 }
+/* Estilo exclusivo para o botão da engrenagem */
+#btnEngrenagem {
+  background-color: #f1f1f1;
+  border: 1px solid #ccc;
+  font-size: 1.3rem;
+  margin-left: 10px;
+  cursor: pointer;
+  color: #333;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: background-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
 
+#btnEngrenagem:hover {
+  background-color: #e2e2e2;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transform: scale(1.05);
+}
 /* Modal geral */
 #modalConfirmar,
 #modalMaquina {
