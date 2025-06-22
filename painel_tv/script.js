@@ -38,58 +38,46 @@ let ultimaChamada = null;
  *   }
  */
 function atualizarUI(chamadas) {
-    if (!chamadas || chamadas.length === 0) return;
+  if (!chamadas || chamadas.length === 0) return;
 
-    // A chamada mais recente vem em chamadas[0]
-    const chamadaAtual = chamadas[0];
+  const chamadaAtual = chamadas[0];
 
-    // Só dispara modal se a senha mudou (nova chamada)
-    if (!ultimaChamada || chamadaAtual.uuid !== ultimaChamada.uuid) {
+  // Só exibe o modal se for uma nova chamada (evita repetir o mesmo som)
+  if (!ultimaChamada || chamadaAtual.uuid !== ultimaChamada.uuid) {
     ultimaChamada = chamadaAtual;
     mostrarModal(chamadaAtual);
-    }
+  }
 
-    // Atualiza texto de "Última chamada"
-    ultimaSenhaElem.textContent = chamadaAtual.senha;
-    ultimaNomeElem.textContent = chamadaAtual.nome;
+  // Atualiza o campo da última senha e nome (topo da tela)
+  ultimaSenhaElem.textContent = chamadaAtual.senha;
+  ultimaNomeElem.textContent = chamadaAtual.nome;
 
-    // PREENCHE AGORA CADA COLUNA A PARTIR DO CAMPO 'setor', NÃO MAIS 'maquina'
-    // Pegamos as 5 últimas chamadas cujo 'setor' inclua a palavra (ignorando maiúsculas/minúsculas)
-    const classificacao = chamadas
-  .filter(
-    c => c.setor && c.setor.toLowerCase().includes("classifica")
-  )
-  .slice(0, 5); // ← mantenha isso apenas se quiser limitar a 5 visualmente
+  // Preenche a coluna CLASSIFICAÇÃO (últimas 5 chamadas com setor contendo "classifica")
+  const classificacao = chamadas
+    .filter(c => c.setor && c.setor.toLowerCase().includes("classifica"))
+    .slice(0, 5);
 
-
-    const recepcao = chamadas
-        .filter(
-            c =>
-            c.setor &&
-            (c.setor.toLowerCase().includes("recepção") ||
-                c.setor.toLowerCase().includes("recep") ||
-                c.setor.toLowerCase().includes("guiche"))
-        )
-        .slice(0, 5);
-
-const medico = chamadas
-    .filter(
-        c =>
-            c.setor &&
-            (
-              c.setor.toLowerCase().includes("medic") ||        // Inclui: Médico
-              c.setor.toLowerCase().includes("consult") ||      // Inclui: Consultório
-              c.setor.toLowerCase().includes("consultório")     // Inclui: Consultório escrito em português
-            )
+  // Preenche a coluna RECEPÇÃO (últimas 5 chamadas cujo setor contenha "recep", "recepção" ou "guiche")
+  const recepcao = chamadas
+    .filter(c =>
+      c.setor &&
+      (c.setor.toLowerCase().includes("recepção") ||
+       c.setor.toLowerCase().includes("recep") ||
+       c.setor.toLowerCase().includes("guiche"))
     )
     .slice(0, 5);
 
+  // Preenche a coluna MÉDICO (últimas 5 chamadas com setor exatamente "Médico")
+  const medico = chamadas
+    .filter(c => c.setor && c.setor.toLowerCase() === "médico")
+    .slice(0, 5);
 
-    // Preenche cada lista (<ul>) com as senhas e nomes
-    preencherLista(listaClassificacao, classificacao);
-    preencherLista(listaRecepcao, recepcao);
-    preencherLista(listaMedico, medico);
+  // Atualiza as 3 colunas da interface
+  preencherLista(listaClassificacao, classificacao);
+  preencherLista(listaRecepcao, recepcao);
+  preencherLista(listaMedico, medico);
 }
+
 
 /**
  * Limpa a <ul> e insere <li> para cada objeto 'c' recebido.
