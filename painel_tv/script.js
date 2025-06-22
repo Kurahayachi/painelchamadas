@@ -8,7 +8,9 @@
 
 // URL do seu Web App (Apps Script) que já implementa `action=chamadas`
 const WEB_APP_URL =
-    "https://script.google.com/macros/s/AKfycbxM3VVRN9dYxQI2_VHPKgTqVgTVk-s_fucAVbNM0EPpG6ZKCWaP0Wz6y3ryvc3MN0z2/exec";
+    "https://script.google.com/macros/s/AKfycbyo-DbtX6Cw1S-fi4_lZZqAPP-taNito-X2idV0liQCF_A1kTHkReR4r8aLrr7iXXf0/exec";
+const WEB_APP_URL_MARCAR =
+    "https://script.google.com/macros/s/AKfycbyo-DbtX6Cw1S-fi4_lZZqAPP-taNito-X2idV0liQCF_A1kTHkReR4r8aLrr7iXXf0/exec";
 
 // Elementos do DOM
 const ultimaSenhaElem = document.getElementById("ultimaSenha");
@@ -43,11 +45,11 @@ function atualizarUI(chamadas) {
   const chamadaAtual = chamadas[0];
 
   // Só exibe o modal se for uma nova chamada (evita repetir o mesmo som)
-  if (!ultimaChamada || chamadaAtual.uuid !== ultimaChamada.uuid) {
-    ultimaChamada = chamadaAtual;
-    mostrarModal(chamadaAtual);
-  }
-
+ if (!ultimaChamada || chamadaAtual.uuid !== ultimaChamada.uuid) {
+  ultimaChamada = chamadaAtual;
+  mostrarModal(chamadaAtual);
+  marcarComoExibido(chamadaAtual.uuid); // <<< Nova linha: marca como exibido na TV
+}
   // Atualiza o campo da última senha e nome (topo da tela)
   ultimaSenhaElem.textContent = chamadaAtual.senha;
   ultimaNomeElem.textContent = chamadaAtual.nome;
@@ -127,6 +129,20 @@ function mostrarModal(chamada) {
 }
 
 /**
+ * Após exibir o modal de uma chamada, envia um GET ao Apps Script
+ * para marcar a linha como "Exibido na TV".
+ */
+function marcarComoExibido(uuid) {
+  fetch(`${WEB_APP_URL_MARCAR}?action=marcarExibido&uuid=${encodeURIComponent(uuid)}`)
+    .then(response => response.json())
+    .then(data => {
+      console.log(`UUID ${uuid} marcado como exibido na TV:`, data);
+    })
+    .catch(error => {
+      console.warn(`Falha ao marcar UUID ${uuid} como exibido:`, error);
+    });
+}
+/**
  * Faz o fetch para `?action=chamadas` a cada 5 s e atualiza a UI.
  */
 async function carregarChamadas() {
@@ -165,3 +181,4 @@ setTimeout(() => {
         location.reload();
     }, 1000);
 }, 1000 * 60 * 1); // Executa o reload a cada 30 minutos
+
