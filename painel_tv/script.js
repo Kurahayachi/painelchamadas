@@ -8,7 +8,7 @@
 
 // URL do seu Web App (Apps Script) que já implementa `action=chamadas`
 const WEB_APP_URL =
-    "https://script.google.com/macros/s/AKfycbw0wHi03HdpRmKcjb4NhJz4YmcXWbKetJuqwdlR5RtbrO9FSOCcraHHvwpp4fWHY1vx/exec";
+    "https://script.google.com/macros/s/AKfycbxM3VVRN9dYxQI2_VHPKgTqVgTVk-s_fucAVbNM0EPpG6ZKCWaP0Wz6y3ryvc3MN0z2/exec";
 
 // Elementos do DOM
 const ultimaSenhaElem = document.getElementById("ultimaSenha");
@@ -149,3 +149,19 @@ document.addEventListener("DOMContentLoaded", () => {
     carregarChamadas();
     setInterval(carregarChamadas, 5000);
 });
+
+/**
+ * Exibe um overlay com spinner antes de fazer o reload automático da TV.
+ * Isso evita congelamento e melhora a experiência visual.
+ */
+setTimeout(() => {
+    const overlay = document.getElementById("loadingOverlay");
+    if (overlay) {
+        overlay.style.display = "flex"; // Mostra o overlay com o spinner
+    }
+
+    // Aguarda 1 segundo para o usuário visualizar a tela de carregamento, depois faz o reload
+    setTimeout(() => {
+        location.reload();
+    }, 1000);
+}, 1000 * 60 * 30); // Executa o reload a cada 30 minutos

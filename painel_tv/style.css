@@ -143,3 +143,43 @@ main {
     box-shadow: 0 0 10px 5px rgba(255, 0, 0, 0.7);
   }
 }
+
+/* Overlay de Carregamento durante o reload automático */
+#loadingOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  display: none; /* Fica invisível até ser ativado */
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 9999;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  color: #333;
+}
+
+/* Spinner moderno (bolinha com um lado transparente) */
+.loader {
+  width: 48px;
+  height: 48px;
+  border: 5px solid #3498db;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
