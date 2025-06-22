@@ -8,7 +8,7 @@
 
 // URL do seu Web App (Apps Script) que já implementa `action=chamadas`
 const WEB_APP_URL =
-    "https://script.google.com/macros/s/AKfycbysDAxOUi6XxQmg_g7oG2xYM0-t2CjrGR36MM1yGq-0nM_kcTlo6NFvxRSpqwZ9YLUv/exec";
+    "https://script.google.com/macros/s/AKfycbz-i8GNawfSHeMSgM3DAsBz3LXu1I0ZIQLWAagmsH2PUtCYtom7YAzxberRJKCOqAyM/exec";
 
 // Elementos do DOM
 const ultimaSenhaElem = document.getElementById("ultimaSenha");
@@ -47,7 +47,7 @@ function exibirModaisSequencial(chamadasPendentes, index = 0) {
   mostrarModal(chamada);
   marcarComoExibido(chamada.uuid);
 
-  
+
   setTimeout(() => {
     exibirModaisSequencial(chamadasPendentes, index + 1);
   }, 12000);
@@ -165,28 +165,45 @@ function marcarComoExibido(uuid) {
       console.warn(`Falha ao marcar UUID ${uuid} como exibido:`, error);
     });
 }
-/**
- * Faz o fetch para `?action=chamadas` a cada 5 s e atualiza a UI.
- */
-async function carregarChamadas() {
+// Função 1: Carrega o histórico para as 3 colunas da tela
+async function carregarHistorico() {
     try {
-        const resp = await fetch(`${WEB_APP_URL}?action=chamadas`);
-
-        if (!resp.ok) throw new Error("Resposta inválida do servidor");
+        const resp = await fetch(`${WEB_APP_URL}?action=historico`);
+        if (!resp.ok) throw new Error("Erro ao carregar histórico");
 
         const dados = await resp.json();
         atualizarUI(dados);
     } catch (e) {
-        // Silencia o erro para não interromper a UX do painel TV
-        console.warn("Falha temporária ao buscar chamadas. Tentando novamente no próximo ciclo...");
+        console.warn("Falha ao carregar histórico:", e);
+    }
+}
+
+// Função 2: Carrega apenas as chamadas pendentes para exibir os modais
+async function carregarPendentes() {
+    try {
+        const resp = await fetch(`${WEB_APP_URL}?action=pendingCalls`);
+        if (!resp.ok) throw new Error("Erro ao buscar chamadas pendentes");
+
+        const dados = await resp.json();
+
+        if (dados && dados.length > 0) {
+            exibirModaisSequencial(dados);
+        }
+    } catch (e) {
+        console.warn("Falha ao buscar chamadas pendentes:", e);
     }
 }
 
 
 // Ao carregar a página, inicia o polling e carrega imediatamente.
 document.addEventListener("DOMContentLoaded", () => {
-    carregarChamadas();
-    setInterval(carregarChamadas, 5000);
+    carregarHistorico();
+    carregarPendentes();
+
+    setInterval(() => {
+        carregarHistorico();
+        carregarPendentes();
+    }, 5000);
 });
 
 /**
