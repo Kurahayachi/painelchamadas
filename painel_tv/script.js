@@ -39,20 +39,29 @@ let ultimaChamada = null;
  *     uuid:    "550e8400-e29b-41d4-a716-446655440000"
  *   }
  */
+/**
+ * Atualiza a interface da TV com base nas chamadas recebidas do Apps Script.
+ * Exibe o modal apenas para as chamadas que ainda não foram exibidas na TV (coluna G ≠ "Sim").
+ * Atualiza o topo da tela com a última senha chamada.
+ */
 function atualizarUI(chamadas) {
   if (!chamadas || chamadas.length === 0) return;
 
-  const chamadaAtual = chamadas[0];
+  // Percorre todas as chamadas recebidas (últimas 40 linhas)
+  chamadas.forEach((chamada) => {
+    // Só exibe o modal se a coluna "Exibido na TV" ainda estiver vazia ou diferente de "Sim"
+    if (!chamada.exibidoTV || chamada.exibidoTV.toLowerCase() !== "sim") {
+      mostrarModal(chamada);
+      marcarComoExibido(chamada.uuid); // Após exibir, marca como exibido na planilha
+    }
+  });
 
-  // Só exibe o modal se for uma nova chamada (evita repetir o mesmo som)
- if (!ultimaChamada || chamadaAtual.uuid !== ultimaChamada.uuid) {
-  ultimaChamada = chamadaAtual;
-  mostrarModal(chamadaAtual);
-  marcarComoExibido(chamadaAtual.uuid); // <<< Nova linha: marca como exibido na TV
-}
   // Atualiza o campo da última senha e nome (topo da tela)
-  ultimaSenhaElem.textContent = chamadaAtual.senha;
-  ultimaNomeElem.textContent = chamadaAtual.nome;
+  const ultimaChamadaNaLista = chamadas[0];
+  if (ultimaChamadaNaLista) {
+    ultimaSenhaElem.textContent = ultimaChamadaNaLista.senha;
+    ultimaNomeElem.textContent = ultimaChamadaNaLista.nome;
+  }
 
   // Preenche a coluna CLASSIFICAÇÃO (últimas 5 chamadas com setor contendo "classifica")
   const classificacao = chamadas
