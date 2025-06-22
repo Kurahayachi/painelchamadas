@@ -47,11 +47,12 @@ function exibirModaisSequencial(chamadasPendentes, index = 0) {
   mostrarModal(chamada);
   marcarComoExibido(chamada.uuid);
 
-
+  // Espera o tempo total (10s de exibição + 2s de pausa) antes de chamar o próximo
   setTimeout(() => {
     exibirModaisSequencial(chamadasPendentes, index + 1);
-  }, 12000);
+  }, 12000);  // Total = 10s + 2s de respiro
 }
+
 /**
  * Atualiza a interface da TV com base nas chamadas recebidas do Apps Script.
  * Exibe o modal apenas para as chamadas que ainda não foram exibidas na TV (coluna G ≠ "Sim").
