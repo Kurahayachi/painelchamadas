@@ -82,7 +82,7 @@ function render() {
 }
 let ultimaLeitura = "";
 
-async function carregarSenhas(maquina) {
+async function carregarSenhas() {
     try {
         const resp = await fetch(`${WEB_APP_URL}?action=listar&maquina=${encodeURIComponent(ultimaLeitura)}`);
         const result = await resp.json();
@@ -197,10 +197,10 @@ async function excluirSenha(senha) {
 }
 
 function iniciarAtualizacaoAutomatica() {
-    const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
-    carregarSenhas(maquina);
-    setInterval(() => carregarSenhas(maquina), POLLING_INTERVAL);
+    carregarSenhas();
+    setInterval(() => carregarSenhas(), POLLING_INTERVAL);
 }
+
 
 btnEngrenagem.addEventListener("click", () => {
     modalMaquina.classList.add("show");
