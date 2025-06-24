@@ -7,7 +7,7 @@
  */
 
 
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxKZrXYpStk9qGgGMzaiR8kO9UCSQVR-YjdXjJ4JhmD1dtDo8gmWRW1TTrkgXk4dDD0/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyRjKhL3Bn7pf9z_2ghGEirGqit2WFVaR94mD8CUv9QqjsC9qP7IT6i_Qt4gp9VsKrb/exec";
 
 setInterval(() => {
     console.log("15 minutos se passaram, recarregando o painel...");
@@ -80,18 +80,24 @@ function render() {
         btn.addEventListener("click", () => abrirModal(btn.dataset.senha));
     });
 }
+let ultimaLeitura = "";
 
 async function carregarSenhas(maquina) {
-  try {
-    const resp = await fetch(`${WEB_APP_URL}?action=listar&maquina=${encodeURIComponent(maquina)}`);
-    if (!resp.ok) throw new Error("Resposta inválida do servidor");
-    
-    senhas = await resp.json();
-    render();
-  } catch (err) {
-    console.warn("Erro silencioso ao carregar senhas (vai tentar novamente no próximo ciclo):", err.message);
-    // Aqui não fazemos nada visual — ele tenta de novo automaticamente no próximo ciclo do setInterval
-  }
+    try {
+        const resp = await fetch(`${WEB_APP_URL}?action=listar&maquina=${encodeURIComponent(ultimaLeitura)}`);
+        const result = await resp.json();
+
+        if (!result.atualizacao) {
+            console.log("Nenhuma atualização detectada, mantendo lista atual.");
+            return;
+        }
+
+        ultimaLeitura = result.ultimaLeitura;
+        senhas = result.senhas;
+        render();
+    } catch (err) {
+        console.warn("Erro ao verificar atualização de senhas:", err.message);
+    }
 }
 
 function abrirModal(senha) {
