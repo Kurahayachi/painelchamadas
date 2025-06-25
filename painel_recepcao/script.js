@@ -34,31 +34,33 @@ function render(senhas) {
   senhas.forEach(({ senha, data, nome, status }) => {
     const tr = document.createElement("tr");
 
-    tr.innerHTML = `
+tr.innerHTML = `
   <td>${senha}</td>
   <td>${new Date(data).toLocaleString()}</td>
   <td>${nome}</td>
   <td>${status}</td>
   <td>
-    <button class="chamarBtn" data-senha="${senha}">📣 Chamar</button>
-    <button class="finalizarBtn" data-senha="${senha}">Finalizar</button>
-    <button class="excluirBtn" data-senha="${senha}">Excluir</button>
+    <button class="chamarBtn btn-primario" data-senha="${senha}">📣 Chamar</button>
+    <button class="finalizarBtn btn-finalizar" data-senha="${senha}">Finalizar</button>
+    <button class="excluirBtn btn-perigo" data-senha="${senha}">Excluir</button>
   </td>
 `;
+
+
     tbody.appendChild(tr);
   });
 }
   document.querySelectorAll(".chamarBtn").forEach(btn => {
-    btn.addEventListener("click", () => chamarPaciente(btn.dataset.senha));
-  });
+  btn.addEventListener("click", () => chamarPaciente(btn.dataset.senha));
+});
 
-  document.querySelectorAll(".finalizarBtn").forEach(btn => {
-    btn.addEventListener("click", () => abrirModalConfirmar(btn.dataset.senha));
-  });
+document.querySelectorAll(".finalizarBtn").forEach(btn => {
+  btn.addEventListener("click", () => abrirModalConfirmar(btn.dataset.senha));
+});
 
-  document.querySelectorAll(".excluirBtn").forEach(btn => {
-    btn.addEventListener("click", () => excluirSenha(btn.dataset.senha));
-  });
+document.querySelectorAll(".excluirBtn").forEach(btn => {
+  btn.addEventListener("click", () => excluirSenha(btn.dataset.senha));
+});
 
  
 async function carregarSenhas() {
