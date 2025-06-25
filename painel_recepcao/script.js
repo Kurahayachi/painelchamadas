@@ -73,7 +73,8 @@ async function carregarSenhas() {
 
     console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada!`);
     ultimaLeitura = result.ultimaLeitura;
-    render(result.senhas);
+    render(result);
+
   } catch (err) {
     console.warn("Erro ao carregar senhas:", err.message);
   }
