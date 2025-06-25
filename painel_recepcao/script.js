@@ -67,14 +67,13 @@ async function carregarSenhas() {
     const result = await resp.json();
 
     if (!result.atualizacao) {
-      console.log(`[${new Date().toLocaleTimeString()}] Nenhuma atualização detectada (timestamp igual).`);
-      return;
+      console.log(`[${new Date().toLocaleTimeString()}] Nenhuma atualização detectada.`);
+      return; // <- aqui evita passar undefined para render()
     }
 
     console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada!`);
     ultimaLeitura = result.ultimaLeitura;
-    render(result);
-
+    render(result.senhas);
   } catch (err) {
     console.warn("Erro ao carregar senhas:", err.message);
   }
