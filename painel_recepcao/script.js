@@ -37,6 +37,7 @@ function render(senhas) {
     tr.innerHTML = `
       <td>${senha}</td>
       <td>${new Date(data).toLocaleString()}</td>
+      <td>${nome}</td>
       <td>${status}</td>
       <td>
         <button class="btn-chamar" onclick="chamarPaciente('${senha}')">📣 Chamar</button>
@@ -47,7 +48,7 @@ function render(senhas) {
 
     tbody.appendChild(tr);
   });
-
+}
   document.querySelectorAll(".chamarBtn").forEach(btn => {
     btn.addEventListener("click", () => chamarPaciente(btn.dataset.senha));
   });
@@ -59,7 +60,7 @@ function render(senhas) {
   document.querySelectorAll(".excluirBtn").forEach(btn => {
     btn.addEventListener("click", () => excluirSenha(btn.dataset.senha));
   });
-}
+
  
 async function carregarSenhas() {
   try {
