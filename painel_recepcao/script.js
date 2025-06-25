@@ -40,16 +40,16 @@ function render(senhas) {
       <td>${nome}</td>
       <td>${status}</td>
       <td>
-        <button class="chamarBtn" data-senha="${senha}">📣 Chamar</button>
-        <button class="finalizarBtn" data-senha="${senha}">Finalizar</button>
-        <button class="excluirBtn" data-senha="${senha}">Excluir</button>
+        <button class="chamarBtn btn-primario" data-senha="${senha}">📣 Chamar</button>
+        <button class="finalizarBtn btn-finalizar" data-senha="${senha}">Finalizar</button>
+        <button class="excluirBtn btn-perigo" data-senha="${senha}">Excluir</button>
       </td>
     `;
 
     tbody.appendChild(tr);
   });
 
-  //  Move os listeners para dentro da função render
+  
   document.querySelectorAll(".chamarBtn").forEach(btn => {
     btn.addEventListener("click", () => chamarPaciente(btn.dataset.senha));
   });
@@ -62,7 +62,6 @@ function render(senhas) {
     btn.addEventListener("click", () => excluirSenha(btn.dataset.senha));
   });
 }
-
  
 async function carregarSenhas() {
   try {
