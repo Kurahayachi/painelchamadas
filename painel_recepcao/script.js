@@ -6,10 +6,11 @@
  * Uso interno permitido mediante autorização do autor.
  */
 
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyHWBjH0V511TkqGWyJKZytHXhbxWtXLNhdgKnap926pnUiYnzW0o5Ml94PHpGC33H_ag/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxmDdZUXKY6k_Vhps5UGnMdLoweUr6tB5jS_pjbfPqjAKpwtSwdiz7UFb0gzVW7RmlSXg/exec";
 
 let senhas = [];
 let senhaSelecionada = "";
+let ultimaLeitura = "";
 
 const tbody = document.querySelector("#senhaTable tbody");
 const POLLING_INTERVAL = 5000;
@@ -26,21 +27,24 @@ function mostrarMensagem(texto) {
   }, 3000);
 }
  
-function render() {
+function render(senhas) {
+  const tbody = document.querySelector("#senhaTable tbody");
   tbody.innerHTML = "";
+
   senhas.forEach(({ senha, data, nome, status }) => {
     const tr = document.createElement("tr");
+
     tr.innerHTML = `
       <td>${senha}</td>
       <td>${new Date(data).toLocaleString()}</td>
-      <td>${nome}</td>
       <td>${status}</td>
       <td>
-        <button class="btn-primario chamarBtn" data-senha="${senha}">📣 Chamar </button>
-        <button class="btn-finalizar finalizarBtn" data-senha="${senha}">Finalizar</button>
-        <button class="btn-perigo excluirBtn" data-senha="${senha}">Excluir</button>
+        <button class="btn-chamar" onclick="chamarPaciente('${senha}')">📣 Chamar</button>
+        <button class="btn-liberar" onclick="liberarPaciente('${senha}')">Liberar</button>
+        <button class="btn-perigo" onclick="excluirSenha('${senha}')">Excluir</button>
       </td>
     `;
+
     tbody.appendChild(tr);
   });
 
@@ -57,16 +61,24 @@ function render() {
   });
 }
  
-async function carregarSenhas(maquina) {
+async function carregarSenhas() {
   try {
-    const resp = await fetch(`${WEB_APP_URL}?action=listar&maquina=${encodeURIComponent(maquina)}`);
-    if (!resp.ok) throw new Error("Resposta inválida");
-    senhas = await resp.json();
-    render();
+    const resp = await fetch(`${WEB_APP_URL}?action=listar&maquina=${encodeURIComponent(ultimaLeitura)}`);
+    const result = await resp.json();
+
+    if (!result.atualizacao) {
+      console.log(`[${new Date().toLocaleTimeString()}] Nenhuma atualização detectada (timestamp igual).`);
+      return;
+    }
+
+    console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada!`);
+    ultimaLeitura = result.ultimaLeitura;
+    render(result.senhas);
   } catch (err) {
-    console.warn("Erro ao carregar senhas (silenciado):", err.message);
+    console.warn("Erro ao carregar senhas:", err.message);
   }
 }
+
  
 async function chamarPaciente(senha) {
   const maquina = localStorage.getItem("maquinaSelecionada") || "Recepção 01";
@@ -129,10 +141,11 @@ async function excluirSenha(senha) {
 }
 
 function iniciarAtualizacaoAutomatica() {
-  const maquina = localStorage.getItem("maquinaSelecionada") || "Recepção 01";
-  carregarSenhas(maquina);
-  setInterval(() => carregarSenhas(maquina), POLLING_INTERVAL);
+  carregarSenhas();
+  setInterval(() => carregarSenhas(), 5000); // A cada 5s
+  setInterval(() => location.reload(), 15 * 60 * 1000); // Recarrega a página a cada 15min
 }
+
 
 const modalMaquina = document.getElementById("modalMaquina");
 const btnEngrenagem = document.getElementById("btnEngrenagem");
