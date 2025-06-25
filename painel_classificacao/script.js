@@ -140,6 +140,9 @@ async function salvarDados() {
         if (result.success) {
             mostrarMensagem("Dados salvos com sucesso!");
             finalizarBtn.disabled = false;
+
+            // 🚀 Atualiza a lista sem F5 (mantendo otimização)
+            carregarSenhas(maquina);
         } else {
             alert("Erro ao salvar dados: " + result.message);
         }
