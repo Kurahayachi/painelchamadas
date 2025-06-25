@@ -88,10 +88,11 @@ async function carregarSenhas() {
         const result = await resp.json();
 
         if (!result.atualizacao) {
-            console.log("Nenhuma atualização detectada, mantendo lista atual.");
+            console.log(`[${new Date().toLocaleTimeString()}] Nenhuma atualização detectada (timestamp igual).`);
             return;
         }
 
+        console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada! Dados recebidos e renderizados.`);
         ultimaLeitura = result.ultimaLeitura;
         senhas = result.senhas;
         render();
