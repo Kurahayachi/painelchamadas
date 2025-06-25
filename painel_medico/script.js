@@ -1,5 +1,5 @@
 const WEB_APP_URL =
-    "https://script.google.com/macros/s/AKfycbwW18MqCt-LE1aTRetUZlUb4fBucreEqAmuZHPUWPjiFpY7f7TtkEh6OQbwTQ42eFoD/exec";
+    "https://script.google.com/macros/s/AKfycbw2c6xdblSlDnO6pkUxBOKtIJq6qw7Sfnfd58xiA21tV-VYylTw3et7A5k-0Uvzz6xe/exec";
 
 // Auto-reload a cada 15 minutos para amnter a sessão ativa
 setInterval(() => {
@@ -10,6 +10,7 @@ setInterval(() => {
 let senhas = [];
 let consultorioSelecionado = "";
 let especialidadesSelecionadas = [];
+let ultimaLeitura = "";
 
 const tbody = document.querySelector("#senhaTable tbody");
 const spanMaquina = document.getElementById("spanMaquina");
@@ -178,12 +179,19 @@ async function finalizarTriagemModal() {
     console.warn("Erro ao finalizar:", err);
   }
 }
-
 async function carregarSenhas() {
   try {
-    const resp = await fetch(`${WEB_APP_URL}?action=listar`);
-    if (!resp.ok) throw new Error("Falha ao buscar dados");
-    senhas = await resp.json();
+    const url = `${WEB_APP_URL}?action=listar${
+      ultimaLeitura ? `&timestamp=${encodeURIComponent(ultimaLeitura)}` : ""
+    }`;
+
+    const resp = await fetch(url);
+    const result = await resp.json();
+
+    if (!result.atualizacao) return;
+
+    senhas = result.senhas;
+    ultimaLeitura = result.ultimaLeitura;
     render();
   } catch (err) {
     console.warn("Erro ao carregar senhas:", err);
