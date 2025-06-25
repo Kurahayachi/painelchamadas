@@ -35,17 +35,16 @@ function render(senhas) {
     const tr = document.createElement("tr");
 
     tr.innerHTML = `
-      <td>${senha}</td>
-      <td>${new Date(data).toLocaleString()}</td>
-      <td>${nome}</td>
-      <td>${status}</td>
-      <td>
-        <button class="btn-chamar" onclick="chamarPaciente('${senha}')">📣 Chamar</button>
-        <button class="btn-liberar" onclick="liberarPaciente('${senha}')">Liberar</button>
-        <button class="btn-perigo" onclick="excluirSenha('${senha}')">Excluir</button>
-      </td>
-    `;
-
+  <td>${senha}</td>
+  <td>${new Date(data).toLocaleString()}</td>
+  <td>${nome}</td>
+  <td>${status}</td>
+  <td>
+    <button class="chamarBtn" data-senha="${senha}">📣 Chamar</button>
+    <button class="finalizarBtn" data-senha="${senha}">Finalizar</button>
+    <button class="excluirBtn" data-senha="${senha}">Excluir</button>
+  </td>
+`;
     tbody.appendChild(tr);
   });
 }
