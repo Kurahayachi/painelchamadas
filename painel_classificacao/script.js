@@ -6,7 +6,7 @@
  */
 
 
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbws4lkd035BY4ILJ9xbI8tee8uVxnbCMWWxoqV3Sbzzvtrc0cfMNiDkA9HOXLyQrfi4/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwlwt_B4sMuYlzNZLlP9_RNa3Jq_HPGUW96Pldab-G0HaH4WfH1Iu4GB4E6htatz4FE/exec";
 const STORAGE_KEY  = "ultimaAtualizacaoTotem";
 
 setInterval(() => {
@@ -16,7 +16,7 @@ setInterval(() => {
 
 let senhas = [];
 let senhaSelecionada = "";
-let ultimaLeitura  = localStorage.getItem(STORAGE_KEY) || "";  // start with "" or last ISO
+let ultimaLeitura  = localStorage.getItem(STORAGE_KEY) || "";
 
 const tbody = document.querySelector("#senhaTable tbody");
 const POLLING_INTERVAL = 5000;
@@ -81,44 +81,28 @@ function render() {
         btn.addEventListener("click", () => abrirModal(btn.dataset.senha));
     });
 }
-
 async function carregarSenhas() {
-  // 2) sempre puxe a máquina selecionada
-  const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
-
-  // 3) monte a URL incluindo o timestampCliente (string ISO ou "")
-  const url = `${WEB_APP_URL}`
-    + `?action=listar`
-    + `&maquina=${encodeURIComponent(maquina)}`
-    + `&timestampCliente=${encodeURIComponent(ultimaLeitura)}`;
-
-  const resp = await fetch(url);
+  const resp = await fetch(
+    `${WEB_APP_URL}?action=listar&timestampCliente=${encodeURIComponent(ultimaLeitura)}`
+  );
   const result = await resp.json();
 
   if (!result.atualizacao) {
-    console.log(`[${new Date().toLocaleTimeString()}] Nenhuma atualização.`);
+    console.log("Nenhuma atualização detectada.");
     return;
   }
 
-  // 4) mostra no console a nova ISO
-  console.log(
-    `[${new Date().toLocaleTimeString()}] Atualização detectada!`,
-    "Nova ISO:", result.ultimaAtualizacao
-  );
+  console.log("Atualização detectada! Novo ISO:", result.ultimaAtualizacao);
 
-  // 5) use o campo CORRETO e persista no storage
+  // salva a **mesma** string ISO que o servidor devolveu
   ultimaLeitura = result.ultimaAtualizacao;
   localStorage.setItem(STORAGE_KEY, ultimaLeitura);
 
-  // 6) atualize sua lista  
-  senhas = result.senhas;
-  render();
+  render(result.senhas);
 }
 
-// 7) dispare na inicialização e no intervalo
 carregarSenhas();
 setInterval(carregarSenhas, POLLING_INTERVAL);
-
 
 function abrirModal(senha) {
     senhaSelecionada = senha;
