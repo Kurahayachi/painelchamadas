@@ -1,13 +1,14 @@
 /**
  * Sistema de Gestão de Atendimento
  * Desenvolvido por Igor M. Kurahayachi
- * Analista de Sistemas - Rede Santa Catarina
  * Todos os direitos reservados.
  * Uso interno permitido mediante autorização do autor.
  */
 
-
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbznpPMdsAsDrWNZWMqySeuqrLsihmAUpIgRnb1zhXGMhmnH-x-DCdKIOd4XN4AXJzSo/exec"
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw34Vr9TFR57v-HTRtaqitajCIjy2OSD8gluoI-tTilkY4MJdga6R3yL-UU0UXRVl56/exec";
+const STORAGE_KEY   = "ultimaAtualizacaoTotem";
+// inicializa com o último epoch ms salvo (ou zero)
+let ultimaLeitura   = Number(localStorage.getItem(STORAGE_KEY) || 0);
 
 setInterval(() => {
     console.log("15 minutos se passaram, recarregando o painel...");
@@ -48,7 +49,6 @@ function mostrarMensagem(texto) {
     }, 3000);
 }
 
-
 function render() {
     tbody.innerHTML = "";
     senhas.forEach(({ senha, data, status }) => {
@@ -58,44 +58,51 @@ function render() {
         if (status === "Em triagem") {
             botoes += `<button class="btn-finalizar" onclick="finalizarTriagem('${senha}')">Finalizar Classificação</button>`;
         } else {
-            botoes += `<button class="btn-chamar chamarBtn" data-senha="${senha}">📣 Chamar </button>`;
+            botoes += `<button class="btn-chamar chamarBtn" data-senha="${senha}">📣 Chamar</button>`;
             botoes += `<button class="btn-primario editarBtn" data-senha="${senha}">Editar</button>`;
             botoes += `<button class="btn-perigo" onclick="excluirSenha('${senha}')">Excluir</button>`;
         }
 
         tr.innerHTML = `
-      <td>${senha}</td>
-      <td>${new Date(data).toLocaleString()}</td>
-      <td>${status}</td>
-      <td>${botoes}</td>
-    `;
+            <td>${senha}</td>
+            <td>${new Date(data).toLocaleString()}</td>
+            <td>${status}</td>
+            <td>${botoes}</td>
+        `;
         tbody.appendChild(tr);
     });
 
-    document.querySelectorAll(".chamarBtn").forEach(btn => {
-        btn.addEventListener("click", () => chamarPaciente(btn));
-    });
+    document.querySelectorAll(".chamarBtn").forEach(btn =>
+        btn.addEventListener("click", () => chamarPaciente(btn))
+    );
 
-    document.querySelectorAll(".editarBtn").forEach(btn => {
-        btn.addEventListener("click", () => abrirModal(btn.dataset.senha));
-    });
+    document.querySelectorAll(".editarBtn").forEach(btn =>
+        btn.addEventListener("click", () => abrirModal(btn.dataset.senha))
+    );
 }
-let ultimaLeitura = "";
 
 async function carregarSenhas() {
     try {
-        const resp = await fetch(`${WEB_APP_URL}?action=listar&timestampCliente=${encodeURIComponent(ultimaLeitura)}`);
+        const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
+        const url = `${WEB_APP_URL}`
+            + `?action=listar`
+            + `&maquina=${encodeURIComponent(maquina)}`
+            + `&timestampCliente=${encodeURIComponent(ultimaLeitura)}`;
+        const resp = await fetch(url);
         const result = await resp.json();
 
         if (!result.atualizacao) {
-  console.log(`[${new Date().toLocaleTimeString()}] Nenhuma atualização detectada.`);
-  return;
-}
+            console.log(`[${new Date().toLocaleTimeString()}] Nenhuma atualização detectada.`);
+            return;
+        }
 
-console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada!`);
-ultimaLeitura = result.ultimaLeitura;
-senhas = result.senhas;
-render();
+        console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada!`);
+        // usa o valor retornado (epoch ms de L2) e persiste
+        ultimaLeitura = result.ultimaAtualizacao;
+        localStorage.setItem(STORAGE_KEY, ultimaLeitura);
+
+        senhas = result.senhas;
+        render();
 
     } catch (err) {
         console.warn("Erro ao verificar atualização de senhas:", err.message);
@@ -136,14 +143,22 @@ async function salvarDados() {
     }
 
     try {
-        const resp = await fetch(`${WEB_APP_URL}?action=chamar&senha=${encodeURIComponent(senhaSelecionada)}&maquina=${encodeURIComponent(maquina)}&nome=${encodeURIComponent(nome)}&idade=${encodeURIComponent(idade)}&especialidade=${encodeURIComponent(especialidade)}&cor=${encodeURIComponent(cor)}&observacao=${encodeURIComponent(observacao)}`);
+        const url = `${WEB_APP_URL}`
+            + `?action=chamar`
+            + `&senha=${encodeURIComponent(senhaSelecionada)}`
+            + `&maquina=${encodeURIComponent(maquina)}`
+            + `&nome=${encodeURIComponent(nome)}`
+            + `&idade=${encodeURIComponent(idade)}`
+            + `&especialidade=${encodeURIComponent(especialidade)}`
+            + `&cor=${encodeURIComponent(cor)}`
+            + `&observacao=${encodeURIComponent(observacao)}`;
+        const resp = await fetch(url);
         const result = await resp.json();
+
         if (result.success) {
             mostrarMensagem("Dados salvos com sucesso!");
             finalizarBtn.disabled = false;
-
-            // 🚀 Atualiza a lista sem F5 (mantendo otimização)
-            carregarSenhas(maquina);
+            carregarSenhas();
         } else {
             alert("Erro ao salvar dados: " + result.message);
         }
@@ -153,14 +168,17 @@ async function salvarDados() {
 }
 
 async function finalizarTriagemModal() {
-    const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
     try {
-        const resp = await fetch(`${WEB_APP_URL}?action=finalizarTriagem&senha=${encodeURIComponent(senhaSelecionada)}`);
+        const url = `${WEB_APP_URL}`
+            + `?action=finalizarTriagem`
+            + `&senha=${encodeURIComponent(senhaSelecionada)}`;
+        const resp = await fetch(url);
         const result = await resp.json();
+
         if (result.success) {
             mostrarMensagem("Classificação finalizada.");
             modal.classList.remove("show");
-            carregarSenhas(maquina);
+            carregarSenhas();
         } else {
             alert("Erro ao finalizar triagem: " + result.message);
         }
@@ -170,13 +188,16 @@ async function finalizarTriagemModal() {
 }
 
 async function finalizarTriagem(senha) {
-    const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
     try {
-        const resp = await fetch(`${WEB_APP_URL}?action=finalizarTriagem&senha=${encodeURIComponent(senha)}`);
+        const url = `${WEB_APP_URL}`
+            + `?action=finalizarTriagem`
+            + `&senha=${encodeURIComponent(senha)}`;
+        const resp = await fetch(url);
         const result = await resp.json();
+
         if (result.success) {
             mostrarMensagem("Classificação finalizada.");
-            carregarSenhas(maquina);
+            carregarSenhas();
         } else {
             alert("Erro ao finalizar triagem: " + result.message);
         }
@@ -187,12 +208,16 @@ async function finalizarTriagem(senha) {
 
 async function excluirSenha(senha) {
     if (!confirm(`Tem certeza que deseja excluir a senha ${senha}?`)) return;
+
     try {
-        const resp = await fetch(`${WEB_APP_URL}?action=excluir&senha=${senha}`);
+        const url = `${WEB_APP_URL}`
+            + `?action=excluir`
+            + `&senha=${encodeURIComponent(senha)}`;
+        const resp = await fetch(url);
         const result = await resp.json();
+
         if (result.success) {
-            const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
-            carregarSenhas(maquina);
+            carregarSenhas();
         } else {
             alert("Erro ao excluir senha: " + result.message);
         }
@@ -203,15 +228,14 @@ async function excluirSenha(senha) {
 
 function iniciarAtualizacaoAutomatica() {
     carregarSenhas();
-    setInterval(() => carregarSenhas(), POLLING_INTERVAL);
+    setInterval(carregarSenhas, POLLING_INTERVAL);
 }
-
 
 btnEngrenagem.addEventListener("click", () => {
     modalMaquina.classList.add("show");
     const maquinaSalva = localStorage.getItem("maquinaSelecionada");
     if (maquinaSalva) {
-        document.querySelectorAll("input[name='classificacao']").forEach((radio) => {
+        document.querySelectorAll("input[name='classificacao']").forEach(radio => {
             radio.checked = radio.value === maquinaSalva;
         });
     }
@@ -231,36 +255,41 @@ salvarMaquinaBtn.addEventListener("click", () => {
     localStorage.setItem("maquinaSelecionada", maquina);
     spanMaquina.textContent = `(Máquina atual: ${maquina})`;
     modalMaquina.classList.remove("show");
-    carregarSenhas(maquina);
+    carregarSenhas();
 });
 
 window.addEventListener("load", () => {
-  const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
-  spanMaquina.textContent = `(Máquina atual: ${maquina})`;
+    const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
+    spanMaquina.textContent = `(Máquina atual: ${maquina})`;
 
-  window.abrirModal = abrirModal;
-  window.excluirSenha = excluirSenha;
-  window.finalizarTriagem = finalizarTriagem;
+    window.abrirModal       = abrirModal;
+    window.excluirSenha     = excluirSenha;
+    window.finalizarTriagem = finalizarTriagem;
 
-  cancelarBtn.addEventListener("click", cancelarModal);
-  salvarBtn.addEventListener("click", salvarDados);
-  finalizarBtn.addEventListener("click", finalizarTriagemModal);
+    cancelarBtn.addEventListener("click", cancelarModal);
+    salvarBtn.addEventListener("click", salvarDados);
+    finalizarBtn.addEventListener("click", finalizarTriagemModal);
 
-  try {
-    iniciarAtualizacaoAutomatica();
-  } catch (error) {
-    console.warn("Erro ao iniciar atualização automática:", error);
-    mostrarMensagem("Não foi possível carregar os dados. Tente novamente.");
-  }
+    try {
+        iniciarAtualizacaoAutomatica();
+    } catch (error) {
+        console.warn("Erro ao iniciar atualização automática:", error);
+        mostrarMensagem("Não foi possível carregar os dados. Tente novamente.");
+    }
 });
 
 async function chamarPaciente(botao) {
-    const senha = botao.dataset.senha;
+    const senha   = botao.dataset.senha;
     const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
 
     try {
-        const resp = await fetch(`${WEB_APP_URL}?action=registrarChamadaTV&senha=${encodeURIComponent(senha)}&maquina=${encodeURIComponent(maquina)}`);
+        const url = `${WEB_APP_URL}`
+            + `?action=registrarChamadaTV`
+            + `&senha=${encodeURIComponent(senha)}`
+            + `&maquina=${encodeURIComponent(maquina)}`;
+        const resp = await fetch(url);
         const result = await resp.json();
+
         if (result.success) {
             mostrarMensagem("Chamada registrada com sucesso.");
             botao.textContent = "Chamar Novamente";
