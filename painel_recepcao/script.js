@@ -6,7 +6,7 @@
  * Uso interno permitido mediante autorização do autor.
  */
 
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyYlFCjKC_dDnxdvV7Dn4SeXRmjFzxWSA7lB_Oe02J-Sx3pFCVL59oAf7nNDIs-f3d22Q/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzPq8oydFn4VqkrqAefp2zPjiAZrgErbsV_rq1uN9pVVLGTgIRc1eHbK4f2tjwDSVT8wg/exec";
 
 let senhas = [];
 let senhaSelecionada = "";
