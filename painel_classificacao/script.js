@@ -5,18 +5,14 @@
  * Uso interno permitido mediante autorização do autor.
  */
 
-
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwlwt_B4sMuYlzNZLlP9_RNa3Jq_HPGUW96Pldab-G0HaH4WfH1Iu4GB4E6htatz4FE/exec";
-const STORAGE_KEY  = "ultimaAtualizacaoTotem";
-
-setInterval(() => {
-    console.log("15 minutos se passaram, recarregando o painel...");
-    location.reload();
-}, 15 * 60 * 1000);
+// Para Classificação: usamos L2 → ultimaAtualizacaoTotem
+const STORAGE_KEY = "ultimaAtualizacaoTotem";
 
 let senhas = [];
 let senhaSelecionada = "";
-let ultimaLeitura  = localStorage.getItem(STORAGE_KEY) || "";
+// inicializa com o último ISO salvo ou vazio
+let ultimaLeitura = localStorage.getItem(STORAGE_KEY) || "";
 
 const tbody = document.querySelector("#senhaTable tbody");
 const POLLING_INTERVAL = 5000;
@@ -31,76 +27,65 @@ const salvarBtn = document.getElementById("salvarBtn");
 const cancelarBtn = document.getElementById("cancelarBtn");
 const finalizarBtn = document.getElementById("finalizarBtn");
 
-const modalMaquina = document.getElementById("modalMaquina");
-const btnEngrenagem = document.getElementById("btnEngrenagem");
-const salvarMaquinaBtn = document.getElementById("salvarMaquinaBtn");
-const cancelarMaquinaBtn = document.getElementById("cancelarMaquinaBtn");
-const spanMaquina = document.getElementById("spanMaquina");
-
 const notificador = document.createElement("div");
 notificador.id = "notificador";
 document.body.appendChild(notificador);
 
 function mostrarMensagem(texto) {
-    notificador.textContent = texto;
-    notificador.style.display = "block";
-    setTimeout(() => {
-        notificador.style.display = "none";
-    }, 3000);
+  notificador.textContent = texto;
+  notificador.style.display = "block";
+  setTimeout(() => notificador.style.display = "none", 3000);
 }
 
-
 function render() {
-    tbody.innerHTML = "";
-    senhas.forEach(({ senha, data, status }) => {
-        const tr = document.createElement("tr");
-        let botoes = "";
-
-        if (status === "Em triagem") {
-            botoes += `<button class="btn-finalizar" onclick="finalizarTriagem('${senha}')">Finalizar Classificação</button>`;
-        } else {
-            botoes += `<button class="btn-chamar chamarBtn" data-senha="${senha}">📣 Chamar </button>`;
-            botoes += `<button class="btn-primario editarBtn" data-senha="${senha}">Editar</button>`;
-            botoes += `<button class="btn-perigo" onclick="excluirSenha('${senha}')">Excluir</button>`;
-        }
-
-        tr.innerHTML = `
+  tbody.innerHTML = "";
+  senhas.forEach(({ senha, data, status }) => {
+    const tr = document.createElement("tr");
+    let botoes = "";
+    if (status === "Em triagem") {
+      botoes = `<button class=\"btn-finalizar\" onclick=\"finalizarTriagem('${senha}')\">Finalizar Classificação</button>`;
+    } else {
+      botoes = `
+        <button class=\"btn-chamar chamarBtn\" data-senha=\"${senha}\">📣 Chamar</button>
+        <button class=\"btn-primario editarBtn\" data-senha=\"${senha}\">Editar</button>
+        <button class=\"btn-perigo\" onclick=\"excluirSenha('${senha}')\">Excluir</button>
+      `;
+    }
+    tr.innerHTML = `
       <td>${senha}</td>
       <td>${new Date(data).toLocaleString()}</td>
       <td>${status}</td>
       <td>${botoes}</td>
     `;
-        tbody.appendChild(tr);
-    });
+    tbody.appendChild(tr);
+  });
 
-    document.querySelectorAll(".chamarBtn").forEach(btn => {
-        btn.addEventListener("click", () => chamarPaciente(btn));
-    });
-
-    document.querySelectorAll(".editarBtn").forEach(btn => {
-        btn.addEventListener("click", () => abrirModal(btn.dataset.senha));
-    });
+  document.querySelectorAll(".chamarBtn").forEach(btn => btn.addEventListener("click", () => chamarPaciente(btn.dataset.senha)));
+  document.querySelectorAll(".editarBtn").forEach(btn => btn.addEventListener("click", () => abrirModal(btn.dataset.senha)));
 }
+
 async function carregarSenhas() {
-  const resp = await fetch(
-    `${WEB_APP_URL}?action=listar&timestampCliente=${encodeURIComponent(ultimaLeitura)}`
-  );
+  // Monta URL enviando o ISO salvo
+  const url = `${WEB_APP_URL}?action=listar&timestampCliente=${encodeURIComponent(ultimaLeitura)}`;
+  const resp = await fetch(url);
   const result = await resp.json();
 
   if (!result.atualizacao) {
-    console.log("Nenhuma atualização detectada.");
+    console.log(`[${new Date().toLocaleTimeString()}] Nenhuma atualização detectada.`);
     return;
   }
 
-  console.log("Atualização detectada! Novo ISO:", result.ultimaAtualizacao);
-
-  // salva a **mesma** string ISO que o servidor devolveu
+  console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada! ISO:`, result.ultimaAtualizacao);
+  // Atualiza o ISO armazenado e no localStorage
   ultimaLeitura = result.ultimaAtualizacao;
   localStorage.setItem(STORAGE_KEY, ultimaLeitura);
 
-  render(result.senhas);
+  // Guarda e renderiza
+  senhas = result.senhas;
+  render();
 }
 
+// Inicia polling e recarga a cada 5s
 carregarSenhas();
 setInterval(carregarSenhas, POLLING_INTERVAL);
 
