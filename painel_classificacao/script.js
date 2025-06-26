@@ -7,7 +7,7 @@
  */
 
 
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxxfPEFGwD5xuCKgr0w3Wvf6mCvqhuwnc2OM8GRgi5AKglv9vc70rnZTL51DZ4fJdHh/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzQoO44n-SKTTWGFfQyv5oQCGaQnx9Lyewa_eM24d7rRoBjpoCpdOrJnU2MwU75v79c/exec";
 
 setInterval(() => {
     console.log("15 minutos se passaram, recarregando o painel...");
@@ -84,18 +84,19 @@ let ultimaLeitura = "";
 
 async function carregarSenhas() {
     try {
-        const resp = await fetch(`${WEB_APP_URL}?action=listar&maquina=${encodeURIComponent(ultimaLeitura)}`);
+        const resp = await fetch(`${WEB_APP_URL}?action=listar&timestampCliente=${encodeURIComponent(ultimaLeitura)}`);
         const result = await resp.json();
 
         if (!result.atualizacao) {
-            console.log(`[${new Date().toLocaleTimeString()}] Nenhuma atualização detectada (timestamp igual).`);
-            return;
-        }
+  console.log(`[${new Date().toLocaleTimeString()}] Nenhuma atualização detectada.`);
+  return;
+}
 
-        console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada! Dados recebidos e renderizados.`);
-        ultimaLeitura = result.ultimaLeitura;
-        senhas = result.senhas;
-        render();
+console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada!`);
+ultimaLeitura = result.ultimaLeitura;
+senhas = result.senhas;
+render();
+
     } catch (err) {
         console.warn("Erro ao verificar atualização de senhas:", err.message);
     }
