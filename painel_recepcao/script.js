@@ -6,7 +6,7 @@
  * Uso interno permitido mediante autorização do autor.
  */
 
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxmDdZUXKY6k_Vhps5UGnMdLoweUr6tB5jS_pjbfPqjAKpwtSwdiz7UFb0gzVW7RmlSXg/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyUoFpxZRSepw3oiXiU0xg1TkD3qnf5Us3beddTbtfyGo8n2sLzc07OtB3vpC6nxcH9IQ/exec";
 
 let senhas = [];
 let senhaSelecionada = "";
@@ -62,10 +62,10 @@ function render(senhas) {
     btn.addEventListener("click", () => excluirSenha(btn.dataset.senha));
   });
 }
- 
+
 async function carregarSenhas() {
   try {
-    const resp = await fetch(`${WEB_APP_URL}?action=listar&maquina=${encodeURIComponent(ultimaLeitura)}`);
+    const resp = await fetch(`${WEB_APP_URL}?action=listar&timestampCliente=${encodeURIComponent(ultimaLeitura)}`);
     const result = await resp.json();
 
     if (!result.atualizacao) {
