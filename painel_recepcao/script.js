@@ -6,11 +6,12 @@
  * Uso interno permitido mediante autorização do autor.
  */
 
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyXb_OHsatPjfl3bJ4w383SzDfnTOSNArPoUra7SePzSADiqm1SQQOCaONY_iTP8k-sJw/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwCHhmcoezFCOpoKYvo2j0GuGz_a9r8qRGU0prhF9Yl4n90EhnKcERFOgFji-mlTdOf/exec";
+const STORAGE_KEY = "ultimaAtualizacaoTotem";
 
 let senhas = [];
 let senhaSelecionada = "";
-let ultimaLeitura = "";
+let ultimaLeitura = localStorage.getItem(STORAGE_KEY) || "";
 
 const tbody = document.querySelector("#senhaTable tbody");
 const POLLING_INTERVAL = 5000;
@@ -62,28 +63,29 @@ function render(senhas) {
     btn.addEventListener("click", () => excluirSenha(btn.dataset.senha));
   });
 }
-
 async function carregarSenhas() {
-  try {
-    const resp = await fetch(`${WEB_APP_URL}?action=listar&timestampCliente=${encodeURIComponent(ultimaLeitura)}`);
-    const result = await resp.json();
+  const resp = await fetch(
+    `${WEB_APP_URL}?action=listar&timestampCliente=${encodeURIComponent(ultimaLeitura)}`
+  );
+  const result = await resp.json();
 
-    if (!result.atualizacao) {
-      console.log(`[${new Date().toLocaleTimeString()}] Nenhuma atualização detectada.`);
-      return;
-    }
-
-    // Atualização confirmada
-    console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada!`);
-    
-    //  AQUI GARANTE QUE O timestamp é salvo para a próxima verificação
-    ultimaLeitura = result.ultimaLeitura;
-
-    render(result.senhas);
-  } catch (err) {
-    console.warn("Erro ao carregar senhas:", err.message);
+  if (!result.atualizacao) {
+    console.log("Nenhuma atualização detectada.");
+    return;
   }
+
+  console.log("Atualização detectada! Nova ISO:", result.ultimaAtualizacao);
+  // armazena a ISO para próxima verificação
+  ultimaLeitura = result.ultimaAtualizacao;
+  localStorage.setItem(STORAGE_KEY, ultimaLeitura);
+
+  // Renderiza lista de senhas aguardando recepção
+  render(result.senhas);
 }
+
+// inicia polling a cada 5s
+carregarSenhas();
+setInterval(carregarSenhas, POLLING_INTERVAL);
 
 async function chamarPaciente(senha) {
   const maquina = localStorage.getItem("maquinaSelecionada") || "Recepção 01";
