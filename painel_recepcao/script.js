@@ -6,7 +6,7 @@
  * Uso interno permitido mediante autorização do autor.
  */
 
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzPq8oydFn4VqkrqAefp2zPjiAZrgErbsV_rq1uN9pVVLGTgIRc1eHbK4f2tjwDSVT8wg/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzB1YwABpxjzrNoZ7v_s6J6s_9JRocr6XfDtM5BhrE3wrSBpMgtRU2uO8FtPuU5jjLfGg/exec";
 
 let senhas = [];
 let senhaSelecionada = "";
@@ -76,7 +76,7 @@ async function carregarSenhas() {
     // Atualização confirmada
     console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada!`);
     
-    // 🔥 AQUI GARANTE QUE O timestamp é salvo para a próxima verificação
+    //  AQUI GARANTE QUE O timestamp é salvo para a próxima verificação
     ultimaLeitura = result.ultimaLeitura;
 
     render(result.senhas);
