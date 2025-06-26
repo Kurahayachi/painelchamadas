@@ -7,7 +7,7 @@
  */
 
 
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxv89PJLct0ySLI7HBp3JcptAiEUp31Y6D7a-iGaMHFF1yG9OjBQMbI-BB1BwHAq9R-/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxU1N3MCOjOk9RPXRMfaCUk-7Wh1P0RTaFUfAAvb_G2lyiNHkBXGnkagwxgySadT4wa/exec";
 
 setInterval(() => {
     console.log("15 minutos se passaram, recarregando o painel...");
