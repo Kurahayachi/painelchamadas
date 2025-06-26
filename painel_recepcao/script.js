@@ -5,7 +5,7 @@
  * Uso interno permitido mediante autorização do autor.
  */
 
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyjRuJFl5WMDgJCpTnBB5iGupDvk4TJErI5_8LjqEnfszvvk1jgLGC_4_7CLWmFHFSxJQ/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxqci7STn4wNQrfg7K-YQ5lJUr88yyAKU90QmRrI0HO2P-n6vXaZIksG0Dp4sKuRKT5oA/exec";
 // chave para comparar o ISO de O2 (ÚltimaAtualizacaoClass)
 const STORAGE_KEY = "ultimaAtualizacaoClass";
 
