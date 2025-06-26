@@ -1,15 +1,12 @@
 /**
  * Sistema de Gestão de Atendimento
  * Desenvolvido por Igor M. Kurahayachi
- * Analista de Sistemas - Rede Santa Catarina
  * Todos os direitos reservados.
  * Uso interno permitido mediante autorização do autor.
  */
 
 
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxQwGau5N_zEPDJ6NvgbOLyWKprIClze-_pJEa3K-qVQ8IpvD_zG7_yiCccDchHGD2N/exec";
-
-
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxOi-VMrSf3ESza0Cm_KUHlD4Wq29tJX46nbrm1mI2awx9t2ma0badPytU9ozeD2ew/exec";
 
 setInterval(() => {
     console.log("15 minutos se passaram, recarregando o painel...");
