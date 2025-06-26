@@ -70,18 +70,21 @@ async function carregarSenhas() {
 
     if (!result.atualizacao) {
       console.log(`[${new Date().toLocaleTimeString()}] Nenhuma atualização detectada.`);
-      return; // <- aqui evita passar undefined para render()
+      return;
     }
 
+    // Atualização confirmada
     console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada!`);
+    
+    // 🔥 AQUI GARANTE QUE O timestamp é salvo para a próxima verificação
     ultimaLeitura = result.ultimaLeitura;
+
     render(result.senhas);
   } catch (err) {
     console.warn("Erro ao carregar senhas:", err.message);
   }
 }
 
- 
 async function chamarPaciente(senha) {
   const maquina = localStorage.getItem("maquinaSelecionada") || "Recepção 01";
   try {
