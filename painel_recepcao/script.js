@@ -65,7 +65,7 @@ function render(senhas) {
 
 async function carregarSenhas() {
   try {
-    const resp = await fetch(`${WEB_APP_URL}?action=listar&maquina=${encodeURIComponent(ultimaLeitura)}`);
+    const resp = await fetch(`${WEB_APP_URL}?action=listar&timestampCliente=${encodeURIComponent(ultimaLeitura)}`);
     const result = await resp.json();
 
     if (!result.atualizacao) {
