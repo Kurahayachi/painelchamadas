@@ -7,6 +7,7 @@
 
 
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbws4lkd035BY4ILJ9xbI8tee8uVxnbCMWWxoqV3Sbzzvtrc0cfMNiDkA9HOXLyQrfi4/exec";
+const STORAGE_KEY  = "ultimaAtualizacaoTotem";
 
 setInterval(() => {
     console.log("15 minutos se passaram, recarregando o painel...");
@@ -15,6 +16,7 @@ setInterval(() => {
 
 let senhas = [];
 let senhaSelecionada = "";
+let ultimaLeitura  = localStorage.getItem(STORAGE_KEY) || "";  // start with "" or last ISO
 
 const tbody = document.querySelector("#senhaTable tbody");
 const POLLING_INTERVAL = 5000;
@@ -79,27 +81,44 @@ function render() {
         btn.addEventListener("click", () => abrirModal(btn.dataset.senha));
     });
 }
-let ultimaLeitura = "";
 
 async function carregarSenhas() {
-    try {
-        const resp = await fetch(`${WEB_APP_URL}?action=listar&timestampCliente=${encodeURIComponent(ultimaLeitura)}`);
-        const result = await resp.json();
+  // 2) sempre puxe a máquina selecionada
+  const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
 
-        if (!result.atualizacao) {
-  console.log(`[${new Date().toLocaleTimeString()}] Nenhuma atualização detectada.`);
-  return;
+  // 3) monte a URL incluindo o timestampCliente (string ISO ou "")
+  const url = `${WEB_APP_URL}`
+    + `?action=listar`
+    + `&maquina=${encodeURIComponent(maquina)}`
+    + `&timestampCliente=${encodeURIComponent(ultimaLeitura)}`;
+
+  const resp = await fetch(url);
+  const result = await resp.json();
+
+  if (!result.atualizacao) {
+    console.log(`[${new Date().toLocaleTimeString()}] Nenhuma atualização.`);
+    return;
+  }
+
+  // 4) mostra no console a nova ISO
+  console.log(
+    `[${new Date().toLocaleTimeString()}] Atualização detectada!`,
+    "Nova ISO:", result.ultimaAtualizacao
+  );
+
+  // 5) use o campo CORRETO e persista no storage
+  ultimaLeitura = result.ultimaAtualizacao;
+  localStorage.setItem(STORAGE_KEY, ultimaLeitura);
+
+  // 6) atualize sua lista  
+  senhas = result.senhas;
+  render();
 }
 
-console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada!`);
-ultimaLeitura = result.ultimaLeitura;
-senhas = result.senhas;
-render();
+// 7) dispare na inicialização e no intervalo
+carregarSenhas();
+setInterval(carregarSenhas, POLLING_INTERVAL);
 
-    } catch (err) {
-        console.warn("Erro ao verificar atualização de senhas:", err.message);
-    }
-}
 
 function abrirModal(senha) {
     senhaSelecionada = senha;
