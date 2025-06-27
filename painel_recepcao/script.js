@@ -5,15 +5,26 @@
  * Uso interno permitido mediante autorização do autor.
  */
 
-const WEB_APP_URL_R = "https://script.google.com/macros/s/AKfycbxqci7STn4wNQrfg7K-YQ5lJUr88yyAKU90QmRrI0HO2P-n6vXaZIksG0Dp4sKuRKT5oA/exec";
-const STORAGE_KEY_R = "ultimaAtualizacaoClass";  // O2 ISO
-const POLLING_INTERVAL_R = 5000;
+const WEB_APP_URL_R       = "https://script.google.com/macros/s/AKfycbxqci7…/exec";
+const STORAGE_KEY_R       = "ultimaAtualizacaoClass";  // O2 ISO
+const POLLING_INTERVAL_R  = 5000;
 
-let senhasR = [];
-let ultimaLeituraR = localStorage.getItem(STORAGE_KEY_R) || "";
-let isFirstLoadR = true;
+// Notificador visual exclusivo para o Painel Recepção
+const notificadorR = document.createElement('div');
+notificadorR.id = 'notificador';
+document.body.appendChild(notificadorR);
 
-const tbodyR = document.querySelector("#senhaTable tbody");
+function mostrarMensagemRecepcao(texto) {
+  notificadorR.textContent = texto;
+  notificadorR.style.display = 'block';
+  setTimeout(() => notificadorR.style.display = 'none', 3000);
+}
+
+let senhasR             = [];
+let ultimaLeituraR      = localStorage.getItem(STORAGE_KEY_R) || "";
+let isFirstLoadR        = true;
+
+const tbodyR            = document.querySelector("#senhaTable tbody");
 
 async function carregarSenhasRecepcao() {
   const tsCliente = isFirstLoadR ? "" : ultimaLeituraR;
@@ -66,14 +77,14 @@ async function chamarPaciente(senha) {
   const maquina = localStorage.getItem("maquinaSelecionada") || "Recepção 01";
   try {
     const resp = await fetch(
-      `${WEB_APP_URL}`
+      `${WEB_APP_URL_R}?action=registrarChamadaTV`
       + `?action=registrarChamadaTV`
       + `&senha=${encodeURIComponent(senha)}`
       + `&maquina=${encodeURIComponent(maquina)}`
     );
     const result = await resp.json();
     if (result.success) {
-      mostrarMensagem("Chamada registrada com sucesso.");
+      mostrarMensagemRecepcao("Chamada registrada com sucesso.");
     } else {
       alert("Erro ao chamar: " + result.message);
     }
@@ -95,14 +106,14 @@ async function finalizarSenha() {
   try {
     // Usa a URL correta do painel de Recepção
     const resp = await fetch(
-      `${WEB_APP_URL_R}`
+      `${WEB_APP_URL_R}?action=liberar`
       + `?action=liberar`
       + `&senha=${encodeURIComponent(senhaConfirmar)}`
       + `&maquina=${encodeURIComponent(maquina)}`
     );
     const result = await resp.json();
     if (result.success) {
-      mostrarMensagem("Atendimento finalizado.");
+      mostrarMensagemRecepcao("Atendimento finalizado.");
       // Fecha o modal antes de recarregar a lista
       fecharModalConfirmar();
       // Força um GET completo na próxima chamada (timestamp vazio)
@@ -124,13 +135,13 @@ async function excluirSenha(senha) {
   if (!confirm(`Tem certeza que deseja excluir a senha ${senha}?`)) return;
   try {
     const resp = await fetch(
-      `${WEB_APP_URL}`
-      + `?action=excluir`
-      + `&senha=${encodeURIComponent(senha)}`
-    );
+  `${WEB_APP_URL_R}?action=excluir`
+  + `&senha=${encodeURIComponent(senha)}`
+  + `&maquina=${encodeURIComponent(maquina)}`
+  );
     const result = await resp.json();
     if (result.success) {
-      carregarSenhas();
+      carregarSenhasRecepcao();
     } else {
       alert("Erro ao excluir: " + result.message);
     }
