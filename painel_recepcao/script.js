@@ -48,9 +48,9 @@ function renderRecepcao() {
       <td>${nome}</td>
       <td>${status}</td>
       <td>
-        <button class=\"chamarBtn\" data-senha=\"${senha}\">📣 Chamar</button>
-        <button class=\"finalizarBtn\" data-senha=\"${senha}\">Finalizar</button>
-        <button class=\"excluirBtn\" data-senha=\"${senha}\">Excluir</button>
+        button class="btn-primario chamarBtn" data-senha="${senha}">📣 Chamar </button>
+        <button class="btn-finalizar finalizarBtn" data-senha="${senha}">Finalizar</button>
+        <button class="btn-perigo excluirBtn" data-senha="${senha}">Excluir</button>
       </td>
     `;
     tbodyR.appendChild(tr);
