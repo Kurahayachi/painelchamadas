@@ -136,20 +136,26 @@ async function salvarDados() {
 }
 
 async function finalizarTriagemModal() {
-    const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
-    try {
-        const resp = await fetch(`${WEB_APP_URL}?action=finalizarTriagem&senha=${encodeURIComponent(senhaSelecionada)}`);
-        const result = await resp.json();
-        if (result.success) {
-            mostrarMensagem("Classificação finalizada.");
-            modal.classList.remove("show");
-            carregarSenhas(maquina);
-        } else {
-            alert("Erro ao finalizar triagem: " + result.message);
-        }
-    } catch (err) {
-        alert("Erro na conexão: " + err.message);
+  const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
+  try {
+    const resp = await fetch(
+      `${WEB_APP_URL}?action=finalizarTriagem&senha=${encodeURIComponent(senhaSelecionada)}`
+    );
+    const result = await resp.json();
+    if (result.success) {
+      mostrarMensagem("Classificação finalizada.");
+      modal.classList.remove("show");
+
+      // ——— FORÇA RECARREGAR TUDO ———
+      isFirstLoad = true;       // na próxima chamada, timestampCliente será ""
+      carregarSenhas();         // dispara um GET completo
+      // ————————————————
+    } else {
+      alert("Erro ao finalizar triagem: " + result.message);
     }
+  } catch (err) {
+    alert("Erro na conexão: " + err.message);
+  }
 }
 
 async function finalizarTriagem(senha) {
