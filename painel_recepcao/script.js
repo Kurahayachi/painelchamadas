@@ -78,7 +78,6 @@ async function chamarPaciente(senha) {
   try {
     const resp = await fetch(
       `${WEB_APP_URL_R}?action=registrarChamadaTV`
-      + `?action=registrarChamadaTV`
       + `&senha=${encodeURIComponent(senha)}`
       + `&maquina=${encodeURIComponent(maquina)}`
     );
@@ -104,19 +103,15 @@ function abrirModalConfirmar(senha) {
 async function finalizarSenha() {
   const maquina = localStorage.getItem("maquinaSelecionada") || "Recepção 01";
   try {
-    // Usa a URL correta do painel de Recepção
     const resp = await fetch(
       `${WEB_APP_URL_R}?action=liberar`
-      + `?action=liberar`
       + `&senha=${encodeURIComponent(senhaConfirmar)}`
       + `&maquina=${encodeURIComponent(maquina)}`
     );
     const result = await resp.json();
     if (result.success) {
       mostrarMensagemRecepcao("Atendimento finalizado.");
-      // Fecha o modal antes de recarregar a lista
       fecharModalConfirmar();
-      // Força um GET completo na próxima chamada (timestamp vazio)
       isFirstLoadR = true;
       carregarSenhasRecepcao();
     } else {
@@ -135,12 +130,12 @@ async function excluirSenha(senha) {
   if (!confirm(`Tem certeza que deseja excluir a senha ${senha}?`)) return;
   try {
     const resp = await fetch(
-  `${WEB_APP_URL_R}?action=excluir`
-  + `&senha=${encodeURIComponent(senha)}`
-  + `&maquina=${encodeURIComponent(maquina)}`
-  );
+      `${WEB_APP_URL_R}?action=excluir`
+      + `&senha=${encodeURIComponent(senha)}`
+    );
     const result = await resp.json();
     if (result.success) {
+      mostrarMensagemRecepcao("Senha excluída com sucesso.");
       carregarSenhasRecepcao();
     } else {
       alert("Erro ao excluir: " + result.message);
@@ -180,7 +175,7 @@ salvarMaquinaBtn.addEventListener("click", () => {
   localStorage.setItem("maquinaSelecionada", selecionado.value);
   spanMaquina.textContent = `(Máquina atual: ${selecionado.value})`;
   modalMaquina.classList.remove("show");
-  carregarSenhas();
+  carregarSenhasRecepcao();
 });
 
 document.addEventListener("DOMContentLoaded", () => {
