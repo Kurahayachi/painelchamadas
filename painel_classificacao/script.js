@@ -6,11 +6,12 @@
  */
 
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwlwt_B4sMuYlzNZLlP9_RNa3Jq_HPGUW96Pldab-G0HaH4WfH1Iu4GB4E6htatz4FE/exec";
-// Para Classificação: usamos L2 → ultimaAtualizacaoTotem
-const STORAGE_KEY = "ultimaAtualizacaoTotem";
+const STORAGE_KEY = "ultimaAtualizacaoTotem";    // L2 ISO
+
 let senhas = [];
 let senhaSelecionada = "";
 let ultimaLeitura = localStorage.getItem(STORAGE_KEY) || "";
+let isFirstLoad = true;
 
 const tbody = document.querySelector("#senhaTable tbody");
 const POLLING_INTERVAL = 5000;
@@ -41,12 +42,12 @@ function render() {
     const tr = document.createElement("tr");
     let botoes = "";
     if (status === "Em triagem") {
-      botoes = `<button class="btn-finalizar" onclick="finalizarTriagem('${senha}')">Finalizar Classificação</button>`;
+      botoes = `<button class=\"btn-finalizar\" onclick=\"finalizarTriagem('${senha}')\">Finalizar Classificação</button>`;
     } else {
       botoes = `
-        <button class="btn-chamar chamarBtn" data-senha="${senha}">📣 Chamar</button>
-        <button class="btn-primario editarBtn" data-senha="${senha}">Editar</button>
-        <button class="btn-perigo" onclick="excluirSenha('${senha}')">Excluir</button>
+        <button class=\"btn-chamar chamarBtn\" data-senha=\"${senha}\">📣 Chamar</button>
+        <button class=\"btn-primario editarBtn\" data-senha=\"${senha}\">Editar</button>
+        <button class=\"btn-perigo\" onclick=\"excluirSenha('${senha}')\">Excluir</button>
       `;
     }
     tr.innerHTML = `
@@ -57,20 +58,18 @@ function render() {
     `;
     tbody.appendChild(tr);
   });
-
-  // listeners corrigidos
-  document.querySelectorAll(".chamarBtn").forEach(btn => {
-    btn.addEventListener("click", () => chamarPaciente(btn.dataset.senha));
-  });
-  document.querySelectorAll(".editarBtn").forEach(btn => {
-    btn.addEventListener("click", () => abrirModal(btn.dataset.senha));
-  });
+  document.querySelectorAll(".chamarBtn").forEach(btn => btn.addEventListener("click", () => chamarPaciente(btn.dataset.senha)));
+  document.querySelectorAll(".editarBtn").forEach(btn => btn.addEventListener("click", () => abrirModal(btn.dataset.senha)));
 }
 
 async function carregarSenhas() {
-  const url = `${WEB_APP_URL}?action=listar&timestampCliente=${encodeURIComponent(ultimaLeitura)}`;
+  // Log para depuração: compara timestampCliente antes do fetch
+  console.log(`[Classificação] timestampCliente atual: ${ultimaLeitura}`);
+  const tsCliente = isFirstLoad ? "" : ultimaLeitura;
+  const url = `${WEB_APP_URL}?action=listar&timestampCliente=${encodeURIComponent(tsCliente)}`;
   const resp = await fetch(url);
   const result = await resp.json();
+  isFirstLoad = false;
 
   if (!result.atualizacao) {
     console.log(`[${new Date().toLocaleTimeString()}] Nenhuma atualização detectada.`);
@@ -78,18 +77,16 @@ async function carregarSenhas() {
   }
 
   console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada! ISO:`, result.ultimaAtualizacao);
+
   ultimaLeitura = result.ultimaAtualizacao;
   localStorage.setItem(STORAGE_KEY, ultimaLeitura);
-
   senhas = result.senhas;
   render();
 }
 
-// Inicia polling e recarga a cada 5s
+// Inicia painel de classificação
 carregarSenhas();
 setInterval(carregarSenhas, POLLING_INTERVAL);
-
-
 function abrirModal(senha) {
     senhaSelecionada = senha;
     limparFormulario();

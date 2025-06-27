@@ -5,34 +5,41 @@
  * Uso interno permitido mediante autorização do autor.
  */
 
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxqci7STn4wNQrfg7K-YQ5lJUr88yyAKU90QmRrI0HO2P-n6vXaZIksG0Dp4sKuRKT5oA/exec";
-// chave para comparar o ISO de O2 (ÚltimaAtualizacaoClass)
-const STORAGE_KEY = "ultimaAtualizacaoClass";
+const WEB_APP_URL_R = "https://script.google.com/macros/s/AKfycbxqci7STn4wNQrfg7K-YQ5lJUr88yyAKU90QmRrI0HO2P-n6vXaZIksG0Dp4sKuRKT5oA/exec";
+const STORAGE_KEY_R = "ultimaAtualizacaoClass";  // O2 ISO
 
-let senhas = [];
-let senhaSelecionada = "";
-// inicializa com o ISO armazenado ou vazio
-let ultimaLeitura = localStorage.getItem(STORAGE_KEY) || "";
+let senhasR = [];
+let ultimaLeituraR = localStorage.getItem(STORAGE_KEY_R) || "";
+let isFirstLoadR = true;
 
-const tbody = document.querySelector("#senhaTable tbody");
-const POLLING_INTERVAL = 5000;
- 
-const notificador = document.createElement("div");
-notificador.id = "notificador"; 
-document.body.appendChild(notificador);
+const tbodyR = document.querySelector("#senhaTable tbody");
+// Se for lista específica, ajustar selector para recepção
 
-function mostrarMensagem(texto) {
-  notificador.textContent = texto;
-  notificador.style.display = "block";
-  setTimeout(() => {
-    notificador.style.display = "none";
-  }, 3000);
+async function carregarSenhasRecepcao() {
+  // Log para depuração: compara timestampCliente em Recepção antes do fetch
+  console.log(`[Recepção] timestampCliente atual: ${ultimaLeituraR}`);
+  const tsCliente = isFirstLoadR ? "" : ultimaLeituraR;
+  const url = `${WEB_APP_URL_R}?action=listar&timestampCliente=${encodeURIComponent(tsCliente)}`;
+  const resp = await fetch(url);
+  const result = await resp.json();
+  isFirstLoadR = false;
+
+  if (!result.atualizacao) {
+    console.log(`[${new Date().toLocaleTimeString()}] Nenhuma atualização detectada.`);
+    return;
+  }
+
+  console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada! ISO:`, result.ultimaAtualizacao);
+
+  ultimaLeituraR = result.ultimaAtualizacao;
+  localStorage.setItem(STORAGE_KEY_R, ultimaLeituraR);
+  senhasR = result.senhas;
+  renderRecepcao();
 }
- 
-function render(senhas) {
-  tbody.innerHTML = "";
 
-  senhas.forEach(({ senha, data, nome, status }) => {
+function renderRecepcao() {
+  tbodyR.innerHTML = "";
+  senhasR.forEach(({ senha, data, nome, status }) => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${senha}</td>
@@ -40,45 +47,21 @@ function render(senhas) {
       <td>${nome}</td>
       <td>${status}</td>
       <td>
-        <button class="chamarBtn btn-primario" data-senha="${senha}">📣 Chamar</button>
-        <button class="finalizarBtn btn-finalizar" data-senha="${senha}">Finalizar</button>
-        <button class="excluirBtn btn-perigo" data-senha="${senha}">Excluir</button>
+        <button class=\"chamarBtn\" data-senha=\"${senha}\">📣 Chamar</button>
+        <button class=\"finalizarBtn\" data-senha=\"${senha}\">Finalizar</button>
+        <button class=\"excluirBtn\" data-senha=\"${senha}\">Excluir</button>
       </td>
     `;
-    tbody.appendChild(tr);
+    tbodyR.appendChild(tr);
   });
-
-  document.querySelectorAll(".chamarBtn").forEach(btn => btn.addEventListener("click", () => chamarPaciente(btn.dataset.senha)));
-  document.querySelectorAll(".finalizarBtn").forEach(btn => btn.addEventListener("click", () => abrirModalConfirmar(btn.dataset.senha)));
-  document.querySelectorAll(".excluirBtn").forEach(btn => btn.addEventListener("click", () => excluirSenha(btn.dataset.senha)));
+  document.querySelectorAll(".chamarBtn").forEach(btn => btn.addEventListener("click", () => chamarPacienteR(btn.dataset.senha)));
+  document.querySelectorAll(".finalizarBtn").forEach(btn => btn.addEventListener("click", () => finalizarRecepcao(btn.dataset.senha)));
+  document.querySelectorAll(".excluirBtn").forEach(btn => btn.addEventListener("click", () => excluirRecepcao(btn.dataset.senha)));
 }
 
-async function carregarSenhas() {
-  // monta URL com timestamp ISO
-  const url = `${WEB_APP_URL}`
-    + `?action=listar`
-    + `&timestampCliente=${encodeURIComponent(ultimaLeitura)}`;
-
-  const resp = await fetch(url);
-  const result = await resp.json();
-
-  if (!result.atualizacao) {
-    console.log(`[${new Date().toLocaleTimeString()}] Nenhuma atualização detectada.`);
-    return;
-  }
-
-  console.log(`Atualização detectada! Nova ISO:`, result.ultimaAtualizacao);
-  // persiste ISO para próxima comparação
-  ultimaLeitura = result.ultimaAtualizacao;
-  localStorage.setItem(STORAGE_KEY, ultimaLeitura);
-
-  // renderiza lista de Aguardando Recepção
-  render(result.senhas);
-}
-
-// inicia polling e recarrega a cada 5s
-carregarSenhas();
-setInterval(carregarSenhas, POLLING_INTERVAL);
+// Inicia painel de recepção
+carregarSenhasRecepcao();
+setInterval(carregarSenhasRecepcao, POLLING_INTERVAL);
 
 async function chamarPaciente(senha) {
   const maquina = localStorage.getItem("maquinaSelecionada") || "Recepção 01";
