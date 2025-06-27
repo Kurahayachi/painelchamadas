@@ -4,7 +4,6 @@
  * Todos os direitos reservados.
  * Uso interno permitido mediante autorização do autor.
  */
-
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwlwt_B4sMuYlzNZLlP9_RNa3Jq_HPGUW96Pldab-G0HaH4WfH1Iu4GB4E6htatz4FE/exec";
 const STORAGE_KEY = "ultimaAtualizacaoTotem";    // L2 ISO
 
@@ -63,7 +62,6 @@ function render() {
 }
 
 async function carregarSenhas() {
-  // Log para depuração: compara timestampCliente antes do fetch
   console.log(`[Classificação] timestampCliente atual: ${ultimaLeitura}`);
   const tsCliente = isFirstLoad ? "" : ultimaLeitura;
   const url = `${WEB_APP_URL}?action=listar&timestampCliente=${encodeURIComponent(tsCliente)}`;
@@ -85,8 +83,9 @@ async function carregarSenhas() {
 }
 
 // Inicia painel de classificação
-carregarSenhas();
+carregarSenhas();  // corrigido de tocarSenhas()
 setInterval(carregarSenhas, POLLING_INTERVAL);
+
 function abrirModal(senha) {
     senhaSelecionada = senha;
     limparFormulario();

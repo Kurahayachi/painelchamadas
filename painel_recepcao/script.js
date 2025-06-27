@@ -6,23 +6,24 @@
  */
 
 const WEB_APP_URL_R = "https://script.google.com/macros/s/AKfycbxqci7STn4wNQrfg7K-YQ5lJUr88yyAKU90QmRrI0HO2P-n6vXaZIksG0Dp4sKuRKT5oA/exec";
-const STORAGE_KEY_R = "ultimaAtualizacaoClass";  // O2 ISO
+const STORAGE_KEY_R = "ultimaAtualizacaoClass";  // ISO de O2
+// não redeclare POLLING_INTERVAL — já declarado no topo do arquivo
+// caso queira usar um intervalo distinto, renomeie para POLLING_INTERVAL_R
 
 let senhasR = [];
 let ultimaLeituraR = localStorage.getItem(STORAGE_KEY_R) || "";
 let isFirstLoadR = true;
 
 const tbodyR = document.querySelector("#senhaTable tbody");
-// Se for lista específica, ajustar selector para recepção
 
 async function carregarSenhasRecepcao() {
-  // Log para depuração: compara timestampCliente em Recepção antes do fetch
   console.log(`[Recepção] timestampCliente atual: ${ultimaLeituraR}`);
   const tsCliente = isFirstLoadR ? "" : ultimaLeituraR;
+  isFirstLoadR = false;
+
   const url = `${WEB_APP_URL_R}?action=listar&timestampCliente=${encodeURIComponent(tsCliente)}`;
   const resp = await fetch(url);
   const result = await resp.json();
-  isFirstLoadR = false;
 
   if (!result.atualizacao) {
     console.log(`[${new Date().toLocaleTimeString()}] Nenhuma atualização detectada.`);
