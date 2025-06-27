@@ -5,7 +5,7 @@
  * Uso interno permitido mediante autorização do autor.
  */
 
-const WEB_APP_URL_R       = "https://script.google.com/macros/s/AKfycbxqci7…/exec";
+const WEB_APP_URL_R       = "https://script.google.com/macros/s/AKfycbxqci7STn4wNQrfg7K-YQ5lJUr88yyAKU90QmRrI0HO2P-n6vXaZIksG0Dp4sKuRKT5oA/exec";
 const STORAGE_KEY_R       = "ultimaAtualizacaoClass";  // O2 ISO
 const POLLING_INTERVAL_R  = 5000;
 
