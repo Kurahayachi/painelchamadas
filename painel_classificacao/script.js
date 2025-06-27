@@ -62,7 +62,6 @@ function render() {
 }
 
 async function carregarSenhas() {
-  console.log(`[Classificação] timestampCliente atual: ${ultimaLeitura}`);
   const tsCliente = isFirstLoad ? "" : ultimaLeitura;
   const url = `${WEB_APP_URL}?action=listar&timestampCliente=${encodeURIComponent(tsCliente)}`;
   const resp = await fetch(url);
