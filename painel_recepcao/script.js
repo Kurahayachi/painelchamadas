@@ -5,95 +5,6 @@
  * Uso interno permitido mediante autorização do autor.
  */
 
-/**
- * Painel Classificação - script.js
- */
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwlwt_B4sMuYlzNZLlP9_RNa3Jq_HPGUW96Pldab-G0HaH4WfH1Iu4GB4E6htatz4FE/exec";
-const STORAGE_KEY = "ultimaAtualizacaoTotem";    // L2 ISO
-
-let senhas = [];
-let senhaSelecionada = "";
-let ultimaLeitura = localStorage.getItem(STORAGE_KEY) || "";
-let isFirstLoad = true;
-
-const tbody = document.querySelector("#senhaTable tbody");
-const POLLING_INTERVAL = 5000;
-
-const modal = document.getElementById("modal");
-const nomeInput = document.getElementById("nome");
-const idadeInput = document.getElementById("idade");
-const especialidadeInput = document.getElementById("especialidade");
-const corInput = document.getElementById("cor");
-const observacaoInput = document.getElementById("observacao");
-const salvarBtn = document.getElementById("salvarBtn");
-const cancelarBtn = document.getElementById("cancelarBtn");
-const finalizarBtn = document.getElementById("finalizarBtn");
-
-const notificador = document.createElement("div");
-notificador.id = "notificador";
-document.body.appendChild(notificador);
-
-function mostrarMensagem(texto) {
-  notificador.textContent = texto;
-  notificador.style.display = "block";
-  setTimeout(() => notificador.style.display = "none", 3000);
-}
-
-function render() {
-  tbody.innerHTML = "";
-  senhas.forEach(({ senha, data, status }) => {
-    const tr = document.createElement("tr");
-    let botoes = "";
-    if (status === "Em triagem") {
-      botoes = `<button class="btn-finalizar" onclick="finalizarTriagem('${senha}')">Finalizar Classificação</button>`;
-    } else {
-      botoes = `
-        <button class="btn-chamar btn-primario chamarBtn" data-senha="${senha}">📣 Chamar</button>
-        <button class="btn-primario editarBtn" data-senha="${senha}">Editar</button>
-        <button class="btn-perigo" onclick="excluirSenha('${senha}')">Excluir</button>
-      `;
-    }
-    tr.innerHTML = `
-      <td>${senha}</td>
-      <td>${new Date(data).toLocaleString()}</td>
-      <td>${status}</td>
-      <td>${botoes}</td>
-    `;
-    tbody.appendChild(tr);
-  });
-  document.querySelectorAll(".chamarBtn").forEach(btn => btn.addEventListener("click", () => chamarPaciente(btn.dataset.senha)));
-  document.querySelectorAll(".editarBtn").forEach(btn => btn.addEventListener("click", () => abrirModal(btn.dataset.senha)));
-}
-
-async function carregarSenhas() {
-  const tsCliente = isFirstLoad ? "" : ultimaLeitura;
-  const url = `${WEB_APP_URL}?action=listar&timestampCliente=${encodeURIComponent(tsCliente)}`;
-  const resp = await fetch(url);
-  const result = await resp.json();
-  isFirstLoad = false;
-
-  if (!result.atualizacao) {
-    console.log(`[${new Date().toLocaleTimeString()}] Nenhuma atualização detectada.`);
-    return;
-  }
-
-  console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada! ISO:`, result.ultimaAtualizacao);
-
-  ultimaLeitura = result.ultimaAtualizacao;
-  localStorage.setItem(STORAGE_KEY, ultimaLeitura);
-  senhas = result.senhas;
-  render();
-}
-
-// Inicia painel de classificação
-carregarSenhas();
-setInterval(carregarSenhas, POLLING_INTERVAL);
-
-// … Funções abrirModal, limparFormulario, salvarDados, finalizarTriagemModal, finalizarTriagem, excluirSenha …
-
-/**
- * Painel Recepção - script.js
- */
 const WEB_APP_URL_R = "https://script.google.com/macros/s/AKfycbxqci7STn4wNQrfg7K-YQ5lJUr88yyAKU90QmRrI0HO2P-n6vXaZIksG0Dp4sKuRKT5oA/exec";
 const STORAGE_KEY_R = "ultimaAtualizacaoClass";  // O2 ISO
 const POLLING_INTERVAL_R = 5000;
@@ -105,7 +16,6 @@ let isFirstLoadR = true;
 const tbodyR = document.querySelector("#senhaTable tbody");
 
 async function carregarSenhasRecepcao() {
-  console.log(`[Recepção] timestampCliente atual: ${ultimaLeituraR}`);
   const tsCliente = isFirstLoadR ? "" : ultimaLeituraR;
   isFirstLoadR = false;
 
@@ -136,25 +46,21 @@ function renderRecepcao() {
       <td>${nome}</td>
       <td>${status}</td>
       <td>
-        <button class="chamarBtn btn-primario" data-senha="${senha}">📣 Chamar</button>
-        <button class="finalizarBtn btn-finalizar" data-senha="${senha}">Finalizar</button>
-        <button class="excluirBtn btn-perigo" data-senha="${senha}">Excluir</button>
+        <button class="btn-primario chamarBtn" data-senha="${senha}">📣 Chamar</button>
+        <button class="btn-finalizar finalizarBtn" data-senha="${senha}">Finalizar</button>
+        <button class="btn-perigo excluirBtn" data-senha="${senha}">Excluir</button>
       </td>
     `;
     tbodyR.appendChild(tr);
   });
-
-  document.querySelectorAll(".chamarBtn").forEach(btn => btn.addEventListener("click", () => chamarPacienteR(btn.dataset.senha)));
-  document.querySelectorAll(".finalizarBtn").forEach(btn => btn.addEventListener("click", () => finalizarRecepcao(btn.dataset.senha)));
-  document.querySelectorAll(".excluirBtn").forEach(btn => btn.addEventListener("click", () => excluirRecepcao(btn.dataset.senha)));
+  // Aplica listeners corretos para as funções existentes
+  document.querySelectorAll(".chamarBtn").forEach(btn => btn.addEventListener("click", () => chamarPaciente(btn.dataset.senha)));
+  document.querySelectorAll(".finalizarBtn").forEach(btn => btn.addEventListener("click", () => abrirModalConfirmar(btn.dataset.senha)));
+  document.querySelectorAll(".excluirBtn").forEach(btn => btn.addEventListener("click", () => excluirSenha(btn.dataset.senha)));
 }
-
 // Inicia painel de recepção
 carregarSenhasRecepcao();
 setInterval(carregarSenhasRecepcao, POLLING_INTERVAL_R);
-
-// … Funções chamarPacienteR, abrirModalConfirmar, finalizarRecepcao, excluirRecepcao …
-
 
 async function chamarPaciente(senha) {
   const maquina = localStorage.getItem("maquinaSelecionada") || "Recepção 01";
