@@ -8,10 +8,8 @@
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwlwt_B4sMuYlzNZLlP9_RNa3Jq_HPGUW96Pldab-G0HaH4WfH1Iu4GB4E6htatz4FE/exec";
 // Para Classificação: usamos L2 → ultimaAtualizacaoTotem
 const STORAGE_KEY = "ultimaAtualizacaoTotem";
-
 let senhas = [];
 let senhaSelecionada = "";
-// inicializa com o último ISO salvo ou vazio
 let ultimaLeitura = localStorage.getItem(STORAGE_KEY) || "";
 
 const tbody = document.querySelector("#senhaTable tbody");
@@ -43,12 +41,12 @@ function render() {
     const tr = document.createElement("tr");
     let botoes = "";
     if (status === "Em triagem") {
-      botoes = `<button class=\"btn-finalizar\" onclick=\"finalizarTriagem('${senha}')\">Finalizar Classificação</button>`;
+      botoes = `<button class="btn-finalizar" onclick="finalizarTriagem('${senha}')">Finalizar Classificação</button>`;
     } else {
       botoes = `
-        <button class=\"btn-chamar chamarBtn\" data-senha=\"${senha}\">📣 Chamar</button>
-        <button class=\"btn-primario editarBtn\" data-senha=\"${senha}\">Editar</button>
-        <button class=\"btn-perigo\" onclick=\"excluirSenha('${senha}')\">Excluir</button>
+        <button class="btn-chamar chamarBtn" data-senha="${senha}">📣 Chamar</button>
+        <button class="btn-primario editarBtn" data-senha="${senha}">Editar</button>
+        <button class="btn-perigo" onclick="excluirSenha('${senha}')">Excluir</button>
       `;
     }
     tr.innerHTML = `
@@ -60,12 +58,16 @@ function render() {
     tbody.appendChild(tr);
   });
 
-  document.querySelectorAll(".chamarBtn").forEach(btn => btn.addEventListener("click", () => chamarPaciente(btn.dataset.senha)));
-  document.querySelectorAll(".editarBtn").forEach(btn => btn.addEventListener("click", () => abrirModal(btn.dataset.senha)));
+  // listeners corrigidos
+  document.querySelectorAll(".chamarBtn").forEach(btn => {
+    btn.addEventListener("click", () => chamarPaciente(btn.dataset.senha));
+  });
+  document.querySelectorAll(".editarBtn").forEach(btn => {
+    btn.addEventListener("click", () => abrirModal(btn.dataset.senha));
+  });
 }
 
 async function carregarSenhas() {
-  // Monta URL enviando o ISO salvo
   const url = `${WEB_APP_URL}?action=listar&timestampCliente=${encodeURIComponent(ultimaLeitura)}`;
   const resp = await fetch(url);
   const result = await resp.json();
@@ -76,11 +78,9 @@ async function carregarSenhas() {
   }
 
   console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada! ISO:`, result.ultimaAtualizacao);
-  // Atualiza o ISO armazenado e no localStorage
   ultimaLeitura = result.ultimaAtualizacao;
   localStorage.setItem(STORAGE_KEY, ultimaLeitura);
 
-  // Guarda e renderiza
   senhas = result.senhas;
   render();
 }
@@ -88,6 +88,7 @@ async function carregarSenhas() {
 // Inicia polling e recarga a cada 5s
 carregarSenhas();
 setInterval(carregarSenhas, POLLING_INTERVAL);
+
 
 function abrirModal(senha) {
     senhaSelecionada = senha;
