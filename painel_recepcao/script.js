@@ -184,3 +184,11 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btnConfirmarFinalizar").addEventListener("click", finalizarSenha);
   iniciarAtualizacaoAutomatica();
 });
+
+// Atualiza a página a cada 15 minutos
+setInterval(() => {
+  console.log("⏰ Refresh forçado a cada 15 minutos para garantir estabilidade.");
+  location.reload();
+}, 15 * 60 * 1000);
+
+
