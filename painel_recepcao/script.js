@@ -151,8 +151,8 @@ async function excluirSenha(senha) {
 }
 
 function iniciarAtualizacaoAutomatica() {
-  carregarSenhas();
-  setInterval(carregarSenhas, POLLING_INTERVAL);
+  carregarSenhasRecepcao();
+  setInterval(carregarSenhasRecepcao, POLLING_INTERVAL_R);
   setInterval(() => location.reload(), 15 * 60 * 1000);
 }
 
