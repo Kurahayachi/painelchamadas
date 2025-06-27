@@ -237,20 +237,22 @@ window.addEventListener("load", () => {
   }
 });
 
-async function chamarPaciente(botao) {
-    const senha = botao.dataset.senha;
-    const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
-
-    try {
-        const resp = await fetch(`${WEB_APP_URL}?action=registrarChamadaTV&senha=${encodeURIComponent(senha)}&maquina=${encodeURIComponent(maquina)}`);
-        const result = await resp.json();
-        if (result.success) {
-            mostrarMensagem("Chamada registrada com sucesso.");
-            botao.textContent = "Chamar Novamente";
-        } else {
-            alert("Erro ao registrar chamada: " + result.message);
-        }
-    } catch (err) {
-        alert("Erro na conexão: " + err.message);
+// Dispara chamada na ChamadaTV passando só a senha
+async function chamarPaciente(senha) {
+  const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
+  try {
+    const resp = await fetch(
+      `${WEB_APP_URL}?action=registrarChamadaTV`
+      + `&senha=${encodeURIComponent(senha)}`
+      + `&maquina=${encodeURIComponent(maquina)}`
+    );
+    const result = await resp.json();
+    if (result.success) {
+      mostrarMensagem("Chamada registrada com sucesso.");
+    } else {
+      alert("Erro ao registrar chamada: " + result.message);
     }
+  } catch (err) {
+    alert("Erro na conexão: " + err.message);
+  }
 }
