@@ -6,7 +6,7 @@
  */
 
 const WEB_APP_URL =
-    "https://script.google.com/macros/s/AKfycbwdqvNMrK5GxggZs9s-9tp_gqDWfbUT3o_g1lHRT-4XP9AR7PKjW-c3sye_KGG_Z7aH/exec";
+    "https://script.google.com/macros/s/AKfycbyo8Qw9Kc6V7pyo8fB_5ABqY7lvXQQ2n3aUPgrbjFy-0helPtsCRZamaTYhptgvFTE8/exec";
 
 // Auto-reload a cada 15 minutos para manter a sessão ativa
 setInterval(() => {
