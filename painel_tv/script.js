@@ -8,7 +8,7 @@
 
 // URL do seu Web App (Apps Script) que já implementa `action=chamadas`
 const WEB_APP_URL =
-    "https://script.google.com/macros/s/AKfycbz-i8GNawfSHeMSgM3DAsBz3LXu1I0ZIQLWAagmsH2PUtCYtom7YAzxberRJKCOqAyM/exec";
+    "https://script.google.com/macros/s/AKfycbz52m-T4tqvO23HDGEVWgI9ZmItUCqL_xzG6HeU3RKO5JJmt6viYBVTlfbAMZaIZtMw/exec";
 
 // Elementos do DOM
 const ultimaSenhaElem = document.getElementById("ultimaSenha");
