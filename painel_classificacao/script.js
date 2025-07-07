@@ -7,13 +7,19 @@
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwlwt_B4sMuYlzNZLlP9_RNa3Jq_HPGUW96Pldab-G0HaH4WfH1Iu4GB4E6htatz4FE/exec";
 const STORAGE_KEY = "ultimaAtualizacaoTotem";    // L2 ISO
 
+// Auto-reload a cada 15 minutos para manter a sessão ativa
+setInterval(() => {
+    console.log("⏳ 15 minutos se passaram, recarregando o painel de classificação…");
+    location.reload();
+}, 15 * 60 * 1000);
+
 let senhas = [];
 let senhaSelecionada = "";
 let ultimaLeitura = localStorage.getItem(STORAGE_KEY) || "";
 let isFirstLoad = true;
 
 const tbody = document.querySelector("#senhaTable tbody");
-const POLLING_INTERVAL = 5000;
+const POLLING_INTERVAL = 10000;
 
 const modal = document.getElementById("modal");
 const nomeInput = document.getElementById("nome");

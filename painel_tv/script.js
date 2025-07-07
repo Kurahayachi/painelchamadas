@@ -261,7 +261,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setInterval(() => {
     carregarHistorico();
     carregarPendentes();
-  }, 5000);
+  }, 10000); // <- Atualiza a chamada (Carregar Histórico) a cada 10 segundos;
 });
 
 /**
@@ -278,5 +278,5 @@ setTimeout(() => {
     setTimeout(() => {
         location.reload();
     }, 1000);
-}, 1000 * 60 * 1); // Executa o reload a cada 30 minutos
+}, 1000 * 60 * 40); // Executa o reload a cada 40 minutos
 

@@ -199,7 +199,7 @@ window.addEventListener("load", async () => {
     .addEventListener("click", finalizarTriagemModal);
 
   await carregarSenhas();
-  setInterval(carregarSenhas, 5000);
+  setInterval(carregarSenhas, 10000);
 
 });
 

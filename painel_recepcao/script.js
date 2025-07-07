@@ -7,7 +7,7 @@
 
 const WEB_APP_URL_R       = "https://script.google.com/macros/s/AKfycbxqci7STn4wNQrfg7K-YQ5lJUr88yyAKU90QmRrI0HO2P-n6vXaZIksG0Dp4sKuRKT5oA/exec";
 const STORAGE_KEY_R       = "ultimaAtualizacaoClass";  // O2 ISO
-const POLLING_INTERVAL_R  = 5000;
+const POLLING_INTERVAL_R  = 10000;
 
 // Notificador visual exclusivo para o Painel Recepção
 const notificadorR = document.createElement('div');
@@ -146,10 +146,17 @@ async function excluirSenha(senha) {
 }
 
 function iniciarAtualizacaoAutomatica() {
+  // 1) carrega imediatamente (GET completo na 1ª vez)
   carregarSenhasRecepcao();
+  // 2) polling a cada POLLING_INTERVAL_R
   setInterval(carregarSenhasRecepcao, POLLING_INTERVAL_R);
-  setInterval(() => location.reload(), 15 * 60 * 1000);
+  // 3) reload forçado a cada 15 minutos
+  setInterval(() => {
+    console.log("⏰ Reload forçado (Recepção) a cada 15 minutos.");
+    location.reload();
+  }, 15 * 60 * 1000);
 }
+
 
 const modalMaquina = document.getElementById("modalMaquina");
 const btnEngrenagem = document.getElementById("btnEngrenagem");
@@ -185,10 +192,6 @@ document.addEventListener("DOMContentLoaded", () => {
   iniciarAtualizacaoAutomatica();
 });
 
-// Atualiza a página a cada 15 minutos
-setInterval(() => {
-  console.log("⏰ Refresh forçado a cada 15 minutos para garantir estabilidade.");
-  location.reload();
-}, 15 * 60 * 1000);
+
 
 
