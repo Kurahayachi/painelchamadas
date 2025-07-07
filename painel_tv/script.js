@@ -67,7 +67,7 @@ function exibirModaisSequencial(chamadasPendentes, index = 0) {
 
   setTimeout(() => {
     exibirModaisSequencial(chamadasPendentes, index + 1);
-  }, 15000); // ou 12000, conforme desejar
+  }, 12000); // conforme desejar
 }
 
 
@@ -166,10 +166,10 @@ function mostrarModal(chamada) {
         audio.play().catch(err => console.warn("Erro ao tocar som:", err));
     }
 
-    // Após 15 s, oculta o modal automaticamente
+    // Após 12 s, oculta o modal automaticamente
     setTimeout(() => {
         modal.classList.remove("show");
-    }, 15000);
+    }, 12000);
 }
 
 /**
