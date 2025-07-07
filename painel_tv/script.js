@@ -44,18 +44,32 @@ let ultimaPendencia = localStorage.getItem("ultimaPendencia") || "";
 /**
  * Exibe os modais de forma sequencial, um por um, com intervalo de 12 segundos entre eles.
  */
+// flag para saber se já estamos mostrando uma sequência
+let isShowingSequence = false;
+
 function exibirModaisSequencial(chamadasPendentes, index = 0) {
-  if (index >= chamadasPendentes.length) return;
+  // se for a primeira chamada e já estivermos exibindo, aborta
+  if (index === 0) {
+    if (isShowingSequence) return;
+    isShowingSequence = true;
+  }
+
+  // fim da sequência
+  if (index >= chamadasPendentes.length) {
+    isShowingSequence = false;
+    return;
+  }
 
   const chamada = chamadasPendentes[index];
   mostrarModal(chamada);
   marcarComoExibido(chamada.uuid);
 
-  // Espera o tempo total (10s de exibição + 2s de pausa) antes de chamar o próximo
+
   setTimeout(() => {
     exibirModaisSequencial(chamadasPendentes, index + 1);
-  }, 15000);  // Total = 10s + 2s de respiro
+  }, 15000); // ou 12000, conforme desejar
 }
+
 
 /**
  * Atualiza a interface da TV com base nas chamadas recebidas do Apps Script.
