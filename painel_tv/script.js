@@ -8,7 +8,7 @@
 
 // URL do seu Web App (Apps Script) que já implementa `action=chamadas`
 const WEB_APP_URL =
-    "https://script.google.com/macros/s/AKfycbz52m-T4tqvO23HDGEVWgI9ZmItUCqL_xzG6HeU3RKO5JJmt6viYBVTlfbAMZaIZtMw/exec";
+    "https://script.google.com/macros/s/AKfycbyiYds4dZ65gugce-a5Ku0mIEXMkjrA8g1JyUyDMAcSmMG3YU7hiCtt8uTUa8b_1l9Y/exec";
 
 // Elementos do DOM
 const ultimaSenhaElem = document.getElementById("ultimaSenha");
@@ -194,7 +194,7 @@ async function carregarPendentes() {
     const resp = await fetch(`${WEB_APP_URL}?action=pendingCalls${tsParam}`);
     const result = await resp.json();
 
-    
+
     if (!result.atualizacao) {
       console.log(`[${new Date().toLocaleTimeString()}] Nenhuma atualização detectada.`);
       return;
