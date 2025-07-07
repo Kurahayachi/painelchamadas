@@ -25,6 +25,7 @@ const listaMedico = document.getElementById("historicoMedico");
 
 let ultimaChamada = null;
 // guarda o timestamp da última chamada pendente exibida
+let isFirstLoadPendentes = true;
 let ultimaPendencia = localStorage.getItem("ultimaPendencia") || "";
 
 
@@ -53,7 +54,7 @@ function exibirModaisSequencial(chamadasPendentes, index = 0) {
   // Espera o tempo total (10s de exibição + 2s de pausa) antes de chamar o próximo
   setTimeout(() => {
     exibirModaisSequencial(chamadasPendentes, index + 1);
-  }, 12000);  // Total = 10s + 2s de respiro
+  }, 15000);  // Total = 10s + 2s de respiro
 }
 
 /**
@@ -140,14 +141,17 @@ function mostrarModal(chamada) {
     modalSenha.textContent = chamada.senha;
     modalNome.textContent = chamada.nome;
     modalMaquina.textContent = chamada.maquina; // agora exibe o nome da máquina que chamou
-
-    modal.classList.add("show");
+    
 
     // toca um áudio de chamada (se existir <audio id="somChamada">)
     const audio = document.getElementById("somChamada");
     if (audio) {
+        audio.pause();              // interrompe qualquer reprodução anterior
+        audio.currentTime = 0;      // retorna ao início
         audio.play().catch(err => console.warn("Erro ao tocar som:", err));
     }
+
+    modal.classList.add("show");
 
     // Após 10 s, oculta o modal automaticamente
     setTimeout(() => {
@@ -184,23 +188,33 @@ async function carregarHistorico() {
 
 // Função 2: Carrega apenas as chamadas pendentes para exibir os modais
 async function carregarPendentes() {
-  // mesmo log de início que os outros painéis
-  console.log(`[${new Date().toLocaleTimeString()}] Atualizando pendências...`);
+  console.log(`[${new Date().toLocaleTimeString()}] ▶️ carregarPendentes() chamado com tsCliente=`, ultimaPendencia);
 
   try {
-    const tsParam = ultimaPendencia
+    // se for o 1º load, força param vazio; senão, usa o stored timestamp
+    const tsParam = (!isFirstLoadPendentes && ultimaPendencia)
       ? `&timestampCliente=${encodeURIComponent(ultimaPendencia)}`
       : "";
+
+    // depois da 1ª chamada, desligue o flag
+    isFirstLoadPendentes = false;
+
     const resp = await fetch(`${WEB_APP_URL}?action=pendingCalls${tsParam}`);
     const result = await resp.json();
 
+    console.log(`[${new Date().toLocaleTimeString()}] ← resposta pendingCalls:`, result);
 
     if (!result.atualizacao) {
-      console.log(`[${new Date().toLocaleTimeString()}] Nenhuma atualização detectada.`);
+      console.log(`[${new Date().toLocaleTimeString()}] Nenhuma pendência nova.`);
       return;
     }
 
-    console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada! ISO: ${result.ultimaAtualizacao}`);
+    console.log(
+      `[${new Date().toLocaleTimeString()}] Novas pendências! ISO:`,
+      result.ultimaAtualizacao,
+      "→ chamadas:",
+      result.chamadas
+    );
 
     if (result.chamadas && result.chamadas.length) {
       exibirModaisSequencial(result.chamadas);
@@ -217,13 +231,16 @@ async function carregarPendentes() {
 
 // Ao carregar a página, inicia o polling e carrega imediatamente.
 document.addEventListener("DOMContentLoaded", () => {
+  // limpa o localStorage para garantir GET completo após F5:
+  localStorage.removeItem("ultimaPendencia");
+  isFirstLoadPendentes = true;
+
+  carregarHistorico();
+  carregarPendentes();
+  setInterval(() => {
     carregarHistorico();
     carregarPendentes();
-
-    setInterval(() => {
-        carregarHistorico();
-        carregarPendentes();
-    }, 5000);
+  }, 5000);
 });
 
 /**
