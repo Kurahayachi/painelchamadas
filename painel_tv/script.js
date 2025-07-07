@@ -181,20 +181,36 @@ async function carregarHistorico() {
 
 // Função 2: Carrega apenas as chamadas pendentes para exibir os modais
 async function carregarPendentes() {
-    try {
-        const resp = await fetch(`${WEB_APP_URL}?action=pendingCalls`);
-        if (!resp.ok) throw new Error("Erro ao buscar chamadas pendentes");
+  console.log(`[${new Date().toLocaleTimeString()}] ▶️ carregarPendentes() chamado com tsCliente=`, ultimaPendencia);
 
-        const dados = await resp.json();
+  try {
+    const tsParam = ultimaPendencia
+      ? `&timestampCliente=${encodeURIComponent(ultimaPendencia)}`
+      : "";
+    const resp = await fetch(`${WEB_APP_URL}?action=pendingCalls${tsParam}`);
+    const result = await resp.json();
 
-        if (dados && dados.length > 0) {
-            exibirModaisSequencial(dados);
-        }
-    } catch (e) {
-        console.warn("Falha ao buscar chamadas pendentes:", e);
+    console.log(`[${new Date().toLocaleTimeString()}] ← resposta pendingCalls:`, result);
+
+    if (!result.atualizacao) {
+      console.log(`[${new Date().toLocaleTimeString()}] Nenhuma pendência nova.`);
+      return;
     }
-}
 
+    console.log(`[${new Date().toLocaleTimeString()}] Novas pendências! ISO:`, result.ultimaAtualizacao, "→ chamadas:", result.chamadas);
+
+    if (result.chamadas && result.chamadas.length) {
+      exibirModaisSequencial(result.chamadas);
+    }
+
+    // Persiste o novo timestamp
+    ultimaPendencia = result.ultimaAtualizacao;
+    localStorage.setItem("ultimaPendencia", ultimaPendencia);
+
+  } catch (e) {
+    console.warn("Falha ao buscar chamadas pendentes:", e);
+  }
+}
 
 // Ao carregar a página, inicia o polling e carrega imediatamente.
 document.addEventListener("DOMContentLoaded", () => {
