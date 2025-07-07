@@ -24,6 +24,9 @@ const listaRecepcao = document.getElementById("historicoRecepcao");
 const listaMedico = document.getElementById("historicoMedico");
 
 let ultimaChamada = null;
+// guarda o timestamp da última chamada pendente exibida
+let ultimaPendencia = localStorage.getItem("ultimaPendencia") || "";
+
 
 /**
  * @param {Array<Object>} chamadas
@@ -197,7 +200,12 @@ async function carregarPendentes() {
       return;
     }
 
-    console.log(`[${new Date().toLocaleTimeString()}] Novas pendências! ISO:`, result.ultimaAtualizacao, "→ chamadas:", result.chamadas);
+    console.log(
+      `[${new Date().toLocaleTimeString()}] Novas pendências! ISO:`,
+      result.ultimaAtualizacao,
+      "→ chamadas:",
+      result.chamadas
+    );
 
     if (result.chamadas && result.chamadas.length) {
       exibirModaisSequencial(result.chamadas);
