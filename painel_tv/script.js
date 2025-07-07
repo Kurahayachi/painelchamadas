@@ -184,7 +184,8 @@ async function carregarHistorico() {
 
 // Função 2: Carrega apenas as chamadas pendentes para exibir os modais
 async function carregarPendentes() {
-  console.log(`[${new Date().toLocaleTimeString()}] ▶️ carregarPendentes() chamado com tsCliente=`, ultimaPendencia);
+  // mesmo log de início que os outros painéis
+  console.log(`[${new Date().toLocaleTimeString()}] Atualizando pendências...`);
 
   try {
     const tsParam = ultimaPendencia
@@ -193,25 +194,19 @@ async function carregarPendentes() {
     const resp = await fetch(`${WEB_APP_URL}?action=pendingCalls${tsParam}`);
     const result = await resp.json();
 
-    console.log(`[${new Date().toLocaleTimeString()}] ← resposta pendingCalls:`, result);
-
+    
     if (!result.atualizacao) {
-      console.log(`[${new Date().toLocaleTimeString()}] Nenhuma pendência nova.`);
+      console.log(`[${new Date().toLocaleTimeString()}] Nenhuma atualização detectada.`);
       return;
     }
 
-    console.log(
-      `[${new Date().toLocaleTimeString()}] Novas pendências! ISO:`,
-      result.ultimaAtualizacao,
-      "→ chamadas:",
-      result.chamadas
-    );
+    console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada! ISO: ${result.ultimaAtualizacao}`);
 
     if (result.chamadas && result.chamadas.length) {
       exibirModaisSequencial(result.chamadas);
     }
 
-    // Persiste o novo timestamp
+
     ultimaPendencia = result.ultimaAtualizacao;
     localStorage.setItem("ultimaPendencia", ultimaPendencia);
 
