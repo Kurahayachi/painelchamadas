@@ -244,6 +244,14 @@ async function carregarPendentes() {
 
 // Ao carregar a página, inicia o polling e carrega imediatamente.
 document.addEventListener("DOMContentLoaded", () => {
+  // <<< aqui: destrava o autoplay do áudio no primeiro clique
+  document.addEventListener("click", () => {
+    const audio = document.getElementById("somChamada");
+    if (audio) {
+      audio.play().then(() => audio.pause()).catch(() => {});
+    }
+  }, { once: true });
+
   // limpa o localStorage para garantir GET completo após F5:
   localStorage.removeItem("ultimaPendencia");
   isFirstLoadPendentes = true;
