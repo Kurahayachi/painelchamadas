@@ -138,25 +138,24 @@ function preencherLista(elemento, dados) {
  * Modal mostra senha, nome e máquina/setor que chamou.
  */
 function mostrarModal(chamada) {
-    modalSenha.textContent = chamada.senha;
-    modalNome.textContent = chamada.nome;
-    modalMaquina.textContent = chamada.maquina; // agora exibe o nome da máquina que chamou
-    
+    modalSenha.textContent  = chamada.senha;
+    modalNome.textContent   = chamada.nome;
+    modalMaquina.textContent = chamada.maquina;
+
+    modal.classList.add("show");
 
     // toca um áudio de chamada (se existir <audio id="somChamada">)
     const audio = document.getElementById("somChamada");
     if (audio) {
-        audio.pause();              // interrompe qualquer reprodução anterior
-        audio.currentTime = 0;      // retorna ao início
+        audio.pause();         // interrompe qualquer reprodução anterior
+        audio.currentTime = 0; // volta ao início
         audio.play().catch(err => console.warn("Erro ao tocar som:", err));
     }
 
-    modal.classList.add("show");
-
-    // Após 10 s, oculta o modal automaticamente
+    // Após 15 s, oculta o modal automaticamente
     setTimeout(() => {
         modal.classList.remove("show");
-    }, 10000);
+    }, 15000);
 }
 
 /**
