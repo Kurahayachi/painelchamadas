@@ -235,6 +235,24 @@ button {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
+/* ——— Destaque para linhas “Em triagem” ——— */
+/* Fundo suave para toda a linha */
+tr.em-triagem td {
+  background-color: rgba(255, 0, 0, 0.1);
+}
+
+/* Badge discreta “Em atendimento” */
+.badge-att {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 6px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  border-radius: 4px;
+  background-color: #ffc107;
+  color: #212529;
+}
+
 html, body {
   height: 100%;
   display: flex;
