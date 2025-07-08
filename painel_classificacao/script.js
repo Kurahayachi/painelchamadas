@@ -4,7 +4,7 @@
  * Todos os direitos reservados.
  * Uso interno permitido mediante autorização do autor.
  */
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbymrdNJ8TrJK7niWWkknk_T9tePRR1RNVfR42qwQxpAWeHcVbLFqEYAaIFoMRgXH99A/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbySI79jD6r3ZIiDORv6QhEvcJHxojBOwGJLrjx9gS2H20MhLbP853iYOCxAUCsTWBgi/exec";
 const STORAGE_KEY = "ultimaAtualizacaoClassificacao";    // combina L2 + O2
 console.log("TYPE WEB_APP_URL:", typeof WEB_APP_URL, WEB_APP_URL);
 
@@ -42,50 +42,46 @@ function mostrarMensagem(texto) {
   setTimeout(() => notificador.style.display = "none", 3000);
 }
 
- function render() {
-   tbody.innerHTML = "";
-   senhas.forEach(({ senha, data, status }) => {
-     const tr = document.createElement("tr");
-     const isTriagem = status.trim() === "Em triagem";
+// 1) Ao renderizar cada linha, marca quem está em triagem:
+function render() {
+  tbody.innerHTML = "";
+  senhas.forEach(({ senha, data, status }) => {
+    const tr = document.createElement("tr");
+    const isTriagem = status.trim() === "Em triagem";
 
-     // 1) destaca toda a linha em triagem
-     if (isTriagem) tr.classList.add("em-triagem");
+    // adiciona a classe para destacar toda a linha
+    if (isTriagem) tr.classList.add("em-triagem");
 
-     // 2) sempre mostra o botão chamar / re-chamar
-     let botoes = `
-       <button class="btn-chamar chamarBtn" data-senha="${senha}">
-         ${isTriagem ? "🔔 Re-Chamar" : "📣 Chamar"}
-       </button>
-       <button class="btn-primario editarBtn" data-senha="${senha}">Editar</button>
-       <button class="btn-perigo" onclick="excluirSenha('${senha}')">Excluir</button>
-     `;
+    // monta o badge “Em atendimento” dentro da célula de status
+    const badge = isTriagem
+      ? `<span class="badge-att">Em atendimento</span>`
+      : "";
 
-     // 3) adiciona o “Finalizar” apenas em triagem
-     if (isTriagem) {
-       botoes += `<button class="btn-finalizar" onclick="finalizarTriagem('${senha}')">
-                    Finalizar Classificação
-                  </button>`;
-     }
+    // monta os botões (Chamar / Re-Chamar, Editar, Excluir…)
+    const botoes = `
+      <button class="btn-chamar chamarBtn" data-senha="${senha}">
+        ${isTriagem ? "🔔 Re-Chamar" : "📣 Chamar"}
+      </button>
+      <button class="btn-primario editarBtn" data-senha="${senha}">Editar</button>
+      <button class="btn-perigo" onclick="excluirSenha('${senha}')">Excluir</button>
+      ${isTriagem ? `<button class="btn-finalizar" onclick="finalizarTriagem('${senha}')">Finalizar</button>` : ""}
+    `;
 
-     // 4) monta as células, com badge opcional
-     tr.innerHTML = `
-       <td>${senha}</td>
-       <td>${new Date(data).toLocaleString()}</td>
-       <td>
-         ${status}
-         ${isTriagem ? `<span class="badge-att">Em atendimento</span>` : ""}
-       </td>
-       <td>${botoes}</td>
-     `;
-     tbody.appendChild(tr);
-   });
+    tr.innerHTML = `
+      <td>${senha}</td>
+      <td>${new Date(data).toLocaleString()}</td>
+      <td>${status} ${badge}</td>
+      <td>${botoes}</td>
+    `;
+    tbody.appendChild(tr);
+  });
 
-   // reaplica os listeners
-   document.querySelectorAll(".chamarBtn")
-     .forEach(btn => btn.addEventListener("click", () => chamarPaciente(btn.dataset.senha)));
-   document.querySelectorAll(".editarBtn")
-     .forEach(btn => btn.addEventListener("click", () => abrirModal(btn.dataset.senha)));
- }
+  // reaplica listeners nos botões de chamar e editar
+  document.querySelectorAll(".chamarBtn")
+    .forEach(btn => btn.addEventListener("click", () => chamarPaciente(btn.dataset.senha)));
+  document.querySelectorAll(".editarBtn")
+    .forEach(btn => btn.addEventListener("click", () => abrirModal(btn.dataset.senha)));
+}
 
 async function carregarSenhas() {
   const tsCliente = isFirstLoad ? "" : ultimaLeitura;
@@ -272,20 +268,16 @@ window.addEventListener("load", () => {
 // Dispara chamada na ChamadaTV passando só a senha
 async function chamarPaciente(senha) {
   const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
-  try {
-    const resp = await fetch(
-      `${WEB_APP_URL}?action=registrarChamadaTV&senha=${encodeURIComponent(senha)}&maquina=${encodeURIComponent(maquina)}`
-    );
-    const result = await resp.json();
-    if (result.success) {
-      mostrarMensagem("Chamada registrada com sucesso.");
-     // força recarregar e trazer o novo status “Em triagem”
-      await carregarSenhas();
-    } else {
-      alert("Erro ao registrar chamada: " + result.message);
-    }
-  } catch (err) {
-    alert("Erro na conexão: " + err.message);
+  const resp = await fetch(
+    `${WEB_APP_URL}?action=registrarChamadaTV&senha=${encodeURIComponent(senha)}&maquina=${encodeURIComponent(maquina)}`
+  );
+  const result = await resp.json();
+  if (result.success) {
+    mostrarMensagem("Chamada registrada com sucesso.");
+    // força recarregar e puxar o novo status “Em triagem”
+    await carregarSenhas();
+  } else {
+    alert("Erro ao registrar chamada: " + result.message);
   }
 }
 
