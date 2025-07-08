@@ -6,6 +6,7 @@
  */
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyJLPl22UHQG7Tq-yoG73GVptU2LH-yvB5ZZlRRT3LnJ9Wd23FlDJDv-GJ9hPatb0fm/exec";
 const STORAGE_KEY = "ultimaAtualizacaoClassificacao";    // combina L2 + O2
+console.log("TYPE WEB_APP_URL:", typeof WEB_APP_URL, WEB_APP_URL);
 
 // Auto-reload a cada 15 minutos para manter a sessão ativa
 setInterval(() => {
@@ -151,7 +152,7 @@ async function salvarDados() {
             finalizarBtn.disabled = false;
 
             // 🚀 Atualiza a lista sem F5 (mantendo otimização)
-            carregarSenhas(maquina);
+            await carregarSenhas();
         } else {
             alert("Erro ao salvar dados: " + result.message);
         }
@@ -273,9 +274,7 @@ async function chamarPaciente(senha) {
   const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
   try {
     const resp = await fetch(
-      `${WEB_APP_URL}?action=registrarChamadaTV`
-       `&senha=${encodeURIComponent(senha)}`
-       `&maquina=${encodeURIComponent(maquina)}`
+      `${WEB_APP_URL}?action=registrarChamadaTV&senha=${encodeURIComponent(senha)}&maquina=${encodeURIComponent(maquina)}`
     );
     const result = await resp.json();
     if (result.success) {
