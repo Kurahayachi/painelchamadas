@@ -85,19 +85,24 @@ function render() {
 
 async function carregarSenhas() {
   const tsCliente = isFirstLoad ? "" : ultimaLeitura;
-  
+  const maquina   = encodeURIComponent(
+    localStorage.getItem("maquinaSelecionada") || "Classificação 01"
+  );
+  const url       = `${WEB_APP_URL}`
+                 `?action=listar`
+                 `&timestampCliente=${encodeURIComponent(tsCliente)}`
+                 `&maquina=${maquina}`;
+
   const resp = await fetch(url);
   const result = await resp.json();
   isFirstLoad = false;
-  const maquina = encodeURIComponent(localStorage.getItem("maquinaSelecionada") || "Classificação 01");
-  const url = `${WEB_APP_URL}?action=listar&timestampCliente=${encodeURIComponent(tsCliente)}&maquina=${maquina}`;
+
   if (!result.atualizacao) {
     console.log(`[${new Date().toLocaleTimeString()}] Nenhuma atualização detectada.`);
     return;
   }
 
-  console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada! ISO:`, result.ultimaAtualizacao);
-
+  
   ultimaLeitura = result.ultimaAtualizacao;
   localStorage.setItem(STORAGE_KEY, ultimaLeitura);
   senhas = result.senhas;
