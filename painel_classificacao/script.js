@@ -4,7 +4,7 @@
  * Todos os direitos reservados.
  * Uso interno permitido mediante autorização do autor.
  */
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbySI79jD6r3ZIiDORv6QhEvcJHxojBOwGJLrjx9gS2H20MhLbP853iYOCxAUCsTWBgi/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyTERxwj-pPHT_w6jxODG_tUWuinUI0ngDOOyRYyTwkYsVownzS2h0VjydClZO32Txn/exec";
 const STORAGE_KEY = "ultimaAtualizacaoClassificacao";    // combina L2 + O2
 console.log("TYPE WEB_APP_URL:", typeof WEB_APP_URL, WEB_APP_URL);
 
@@ -85,11 +85,12 @@ function render() {
 
 async function carregarSenhas() {
   const tsCliente = isFirstLoad ? "" : ultimaLeitura;
-  const url = `${WEB_APP_URL}?action=listar&timestampCliente=${encodeURIComponent(tsCliente)}`;
+  
   const resp = await fetch(url);
   const result = await resp.json();
   isFirstLoad = false;
-
+  const maquina = encodeURIComponent(localStorage.getItem("maquinaSelecionada") || "Classificação 01");
+  const url = `${WEB_APP_URL}?action=listar&timestampCliente=${encodeURIComponent(tsCliente)}&maquina=${maquina}`;
   if (!result.atualizacao) {
     console.log(`[${new Date().toLocaleTimeString()}] Nenhuma atualização detectada.`);
     return;
