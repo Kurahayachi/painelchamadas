@@ -4,7 +4,7 @@
  * Todos os direitos reservados.
  * Uso interno permitido mediante autorização do autor.
  */
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyJLPl22UHQG7Tq-yoG73GVptU2LH-yvB5ZZlRRT3LnJ9Wd23FlDJDv-GJ9hPatb0fm/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbymrdNJ8TrJK7niWWkknk_T9tePRR1RNVfR42qwQxpAWeHcVbLFqEYAaIFoMRgXH99A/exec";
 const STORAGE_KEY = "ultimaAtualizacaoClassificacao";    // combina L2 + O2
 console.log("TYPE WEB_APP_URL:", typeof WEB_APP_URL, WEB_APP_URL);
 
