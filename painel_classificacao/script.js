@@ -268,16 +268,35 @@ window.addEventListener("load", () => {
 // Dispara chamada na ChamadaTV passando só a senha
 async function chamarPaciente(senha) {
   const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
-  const resp = await fetch(
-    `${WEB_APP_URL}?action=registrarChamadaTV&senha=${encodeURIComponent(senha)}&maquina=${encodeURIComponent(maquina)}`
-  );
-  const result = await resp.json();
-  if (result.success) {
-    mostrarMensagem("Chamada registrada com sucesso.");
-    // força recarregar e puxar o novo status “Em triagem”
-    await carregarSenhas();
-  } else {
-    alert("Erro ao registrar chamada: " + result.message);
+  try {
+    const resp = await fetch(
+      `${WEB_APP_URL}?action=registrarChamadaTV&senha=${encodeURIComponent(senha)}&maquina=${encodeURIComponent(maquina)}`
+    );
+    const result = await resp.json();
+    if (result.success) {
+      mostrarMensagem("Chamada registrada com sucesso.");
+
+      // → Atualiza visualmente para “Em triagem” imediatamente:
+      const btn = document.querySelector(`.chamarBtn[data-senha="${senha}"]`);
+      const tr  = btn.closest("tr");
+      // 1) muda o texto da célula de Status (3ª coluna)
+      const tdStatus = tr.querySelector("td:nth-child(3)");
+      tdStatus.textContent = "Em triagem";
+      // 2) adiciona o badge
+      tdStatus.insertAdjacentHTML("beforeend", ` <span class="badge-att">Em atendimento</span>`);
+      // 3) destaca a linha inteira
+      tr.classList.add("em-triagem");
+      // 4) transforma o botão em “Re-Chamar” e aplica estilo “chamado”
+      btn.textContent = "🔔 Re-Chamar";
+      btn.classList.add("chamado");
+
+      // (Opcional) força um novo fetch para manter tudo sincronizado
+      await carregarSenhas();
+    } else {
+      alert("Erro ao registrar chamada: " + result.message);
+    }
+  } catch (err) {
+    alert("Erro na conexão: " + err.message);
   }
 }
 
