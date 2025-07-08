@@ -4,7 +4,7 @@
  * Todos os direitos reservados.
  * Uso interno permitido mediante autorização do autor.
  */
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz3X__PMq9vR7epyS7Jj6gYPWJ4dO7c2CCMBvW0-h9jWxqbQDU5i5uRMgdGAgOO5go2/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzkGO_7tbXmxgEnQYev1hkmhDeCfC8QSEto3_6rcAVRDN5mBQIP1Ij-s14Y5d-0GySu/exec";
 const STORAGE_KEY = "ultimaAtualizacaoTotem";    // L2 ISO
 
 // Auto-reload a cada 15 minutos para manter a sessão ativa
@@ -12,7 +12,6 @@ setInterval(() => {
     console.log("⏳ 15 minutos se passaram, recarregando o painel de classificação…");
     location.reload();
 }, 15 * 60 * 1000);
-
 
 let senhas = [];
 let senhaSelecionada = "";
@@ -46,43 +45,16 @@ function render() {
   tbody.innerHTML = "";
   senhas.forEach(({ senha, data, status }) => {
     const tr = document.createElement("tr");
-    const isAtendimento = status === "Em atendimento";
-
-    // 1) destaca toda a linha se estiver em atendimento
-    if (isAtendimento) tr.classList.add("em-triagem");
-
-    // 2) monta os botões de ação
-    let botoes;
-    if (isAtendimento) {
-      botoes = `
-        <button class="btn-chamar chamarBtn" data-senha="${senha}">
-          🔔 Re-Chamar
-        </button>
-        <button class="btn-finalizar" onclick="finalizarTriagem('${senha}')">
-          Finalizar Classificação
-        </button>
-        <button class="btn-primario editarBtn" data-senha="${senha}">
-          Editar
-        </button>
-        <button class="btn-perigo" onclick="excluirSenha('${senha}')">
-          Excluir
-        </button>
-      `;
+    let botoes = "";
+    if (status === "Em triagem") {
+      botoes = `<button class=\"btn-finalizar\" onclick=\"finalizarTriagem('${senha}')\">Finalizar Classificação</button>`;
     } else {
       botoes = `
-        <button class="btn-chamar chamarBtn" data-senha="${senha}">
-          📣 Chamar
-        </button>
-        <button class="btn-primario editarBtn" data-senha="${senha}">
-          Editar
-        </button>
-        <button class="btn-perigo" onclick="excluirSenha('${senha}')">
-          Excluir
-        </button>
+        <button class=\"btn-chamar chamarBtn\" data-senha=\"${senha}\">📣 Chamar</button>
+        <button class=\"btn-primario editarBtn\" data-senha=\"${senha}\">Editar</button>
+        <button class=\"btn-perigo\" onclick=\"excluirSenha('${senha}')\">Excluir</button>
       `;
     }
-
-    // 3) monta a linha
     tr.innerHTML = `
       <td>${senha}</td>
       <td>${new Date(data).toLocaleString()}</td>
@@ -91,12 +63,8 @@ function render() {
     `;
     tbody.appendChild(tr);
   });
-
-  // 4) reaplica os listeners
-  document.querySelectorAll(".chamarBtn")
-    .forEach(btn => btn.addEventListener("click", () => chamarPaciente(btn.dataset.senha)));
-  document.querySelectorAll(".editarBtn")
-    .forEach(btn => btn.addEventListener("click", () => abrirModal(btn.dataset.senha)));
+  document.querySelectorAll(".chamarBtn").forEach(btn => btn.addEventListener("click", () => chamarPaciente(btn.dataset.senha)));
+  document.querySelectorAll(".editarBtn").forEach(btn => btn.addEventListener("click", () => abrirModal(btn.dataset.senha)));
 }
 
 async function carregarSenhas() {
@@ -281,25 +249,22 @@ window.addEventListener("load", () => {
   }
 });
 
-// Dispara CHAMADA: grava "Em atendimento" na aba Pacientes via ?action=chamar
+// Dispara chamada na ChamadaTV passando só a senha
 async function chamarPaciente(senha) {
   const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
   try {
     const resp = await fetch(
-      `${WEB_APP_URL}?action=chamar`
+      `${WEB_APP_URL}?action=registrarChamadaTV`
       + `&senha=${encodeURIComponent(senha)}`
       + `&maquina=${encodeURIComponent(maquina)}`
-      // Se quiser já passar alguns campos que você preenche depois,
-      // pode adicionar &nome=&idade=&especialidade=&cor=&observacao=
     );
     const result = await resp.json();
-    if (!result.success) throw new Error(result.message || "falha ao chamar");
-
-    mostrarMensagem("Paciente agora em atendimento.");
-    // Recarrega — e como a API já vai trazer quem está "Em atendimento",
-    // o render() vai destacá-lo
-    await carregarSenhas();
+    if (result.success) {
+      mostrarMensagem("Chamada registrada com sucesso.");
+    } else {
+      alert("Erro ao registrar chamada: " + result.message);
+    }
   } catch (err) {
-    alert("Erro ao chamar paciente: " + err.message);
+    alert("Erro na conexão: " + err.message);
   }
 }
