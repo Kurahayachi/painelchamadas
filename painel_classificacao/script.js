@@ -45,41 +45,26 @@ function render() {
   tbody.innerHTML = "";
   senhas.forEach(({ senha, data, status }) => {
     const tr = document.createElement("tr");
-    const isTriagem = status.trim() === "Em triagem";
-
-    // 1) destaque de linha
-    if (isTriagem) tr.classList.add("em-triagem");
-
-    // 2) monta sempre o botão Chamar/Re-Chamar
-    let botoes = `
-      <button class="btn-chamar chamarBtn" data-senha="${senha}">
-        ${isTriagem ? "🔔 Re-Chamar" : "📣 Chamar"}
-      </button>
-      <button class="btn-primario editarBtn" data-senha="${senha}">Editar</button>
-      <button class="btn-perigo" onclick="excluirSenha('${senha}')">Excluir</button>
-    `;
-    // 3) só “Finalizar” em triagem
-    if (isTriagem) {
-      botoes += `<button class="btn-finalizar" onclick="finalizarTriagem('${senha}')">
-                   Finalizar Classificação
-                 </button>`;
+    let botoes = "";
+    if (status === "Em triagem") {
+      botoes = `<button class=\"btn-finalizar\" onclick=\"finalizarTriagem('${senha}')\">Finalizar Classificação</button>`;
+    } else {
+      botoes = `
+        <button class=\"btn-chamar chamarBtn\" data-senha=\"${senha}\">📣 Chamar</button>
+        <button class=\"btn-primario editarBtn\" data-senha=\"${senha}\">Editar</button>
+        <button class=\"btn-perigo\" onclick=\"excluirSenha('${senha}')\">Excluir</button>
+      `;
     }
-
-    // 4) renderiza a linha
     tr.innerHTML = `
       <td>${senha}</td>
       <td>${new Date(data).toLocaleString()}</td>
-      <td class="${isTriagem ? "status-em-triagem" : ""}">${status}</td>
+      <td>${status}</td>
       <td>${botoes}</td>
     `;
     tbody.appendChild(tr);
   });
-
-  // reaplica listeners
-  document.querySelectorAll(".chamarBtn")
-    .forEach(btn => btn.addEventListener("click", () => chamarPaciente(btn.dataset.senha)));
-  document.querySelectorAll(".editarBtn")
-    .forEach(btn => btn.addEventListener("click", () => abrirModal(btn.dataset.senha)));
+  document.querySelectorAll(".chamarBtn").forEach(btn => btn.addEventListener("click", () => chamarPaciente(btn.dataset.senha)));
+  document.querySelectorAll(".editarBtn").forEach(btn => btn.addEventListener("click", () => abrirModal(btn.dataset.senha)));
 }
 
 async function carregarSenhas() {
@@ -268,7 +253,7 @@ window.addEventListener("load", () => {
 async function chamarPaciente(senha) {
   const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
   try {
-    const resp   = await fetch(
+    const resp = await fetch(
       `${WEB_APP_URL}?action=registrarChamadaTV`
       + `&senha=${encodeURIComponent(senha)}`
       + `&maquina=${encodeURIComponent(maquina)}`
@@ -276,13 +261,6 @@ async function chamarPaciente(senha) {
     const result = await resp.json();
     if (result.success) {
       mostrarMensagem("Chamada registrada com sucesso.");
-
-      // ← Aqui: pintamos o botão de cinza antes de recarregar
-      const btn = document.querySelector(`.chamarBtn[data-senha="${senha}"]`);
-      if (btn) btn.classList.add("chamado");
-
-      // força re-render (opcional, caso queira atualizar a lista imediatamente)
-      await carregarSenhas();
     } else {
       alert("Erro ao registrar chamada: " + result.message);
     }
@@ -290,4 +268,3 @@ async function chamarPaciente(senha) {
     alert("Erro na conexão: " + err.message);
   }
 }
-
