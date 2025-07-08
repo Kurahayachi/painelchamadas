@@ -5,8 +5,8 @@
  * Uso interno permitido mediante autorização do autor.
  */
 
-const WEB_APP_URL_R       = "https://script.google.com/macros/s/AKfycbxqci7STn4wNQrfg7K-YQ5lJUr88yyAKU90QmRrI0HO2P-n6vXaZIksG0Dp4sKuRKT5oA/exec";
-const STORAGE_KEY_R       = "ultimaAtualizacaoClass";  // O2 ISO
+const WEB_APP_URL_R       = "https://script.google.com/macros/s/AKfycbwI3oGrM5o_yagDMqpxPm_iY2Jwg1-M_VvSdcTmP6Vl2TW_kS-gziKHUWHz6ZOQ_IXgXQ/exec";
+const STORAGE_KEY_R = "ultimaAtualizacaoRecepcao";  // combina O2 + Q2
 const POLLING_INTERVAL_R  = 10000;
 
 // Notificador visual exclusivo para o Painel Recepção
