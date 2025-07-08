@@ -268,7 +268,7 @@ window.addEventListener("load", () => {
 async function chamarPaciente(senha) {
   const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
   try {
-    const resp = await fetch(
+    const resp   = await fetch(
       `${WEB_APP_URL}?action=registrarChamadaTV`
       + `&senha=${encodeURIComponent(senha)}`
       + `&maquina=${encodeURIComponent(maquina)}`
@@ -276,7 +276,13 @@ async function chamarPaciente(senha) {
     const result = await resp.json();
     if (result.success) {
       mostrarMensagem("Chamada registrada com sucesso.");
-+     await carregarSenhas(); // força re-render para aplicar o destaque
+
+      // ← Aqui: pintamos o botão de cinza antes de recarregar
+      const btn = document.querySelector(`.chamarBtn[data-senha="${senha}"]`);
+      if (btn) btn.classList.add("chamado");
+
+      // força re-render (opcional, caso queira atualizar a lista imediatamente)
+      await carregarSenhas();
     } else {
       alert("Erro ao registrar chamada: " + result.message);
     }
