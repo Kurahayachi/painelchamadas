@@ -12,7 +12,8 @@ setInterval(() => {
     console.log("⏳ 15 minutos se passaram, recarregando o painel de classificação…");
     location.reload();
 }, 15 * 60 * 1000);
-asdgsd
+
+
 let senhas = [];
 let senhaSelecionada = "";
 let ultimaLeitura = localStorage.getItem(STORAGE_KEY) || "";
