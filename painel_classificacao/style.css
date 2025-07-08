@@ -235,27 +235,6 @@ button {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
-/* Badge “Em atendimento” */
-.badge-att {
-  display: inline-block;
-  margin-left: 8px;
-  padding: 2px 6px;
-  font-size: .75rem;
-  font-weight: bold;
-  border-radius: 4px;
-  background-color: #ffc107;
-  color: #212529;
-}
-/* Linha com status Em triagem */
-tr.em-triagem td {
-  background-color: rgba(255, 0, 0, 0.1);
-}
-/* Botão Re-Chamar cinza */
-.btn-chamar.chamado {
-  background-color: #ccc;
-  color: #666;
-}
-
 html, body {
   height: 100%;
   display: flex;
