@@ -4,7 +4,7 @@
  * Todos os direitos reservados.
  * Uso interno permitido mediante autorização do autor.
  */
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwBxZuES-lXVJP9jOtxz23TbCX0tRMs6lndFaclmJEXOJdx1XKc6--tG4KIBYPBA8t0/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby_ePs8lkcAvn4TMq0RdNPUO7tu9NQMH3mYXW8gJRSIQ_HgssNTvUtF7TmSrzXtx4UA/exec";
 const STORAGE_KEY = "ultimaAtualizacaoTotem";    // L2 ISO
 
 // Auto-reload a cada 15 minutos para manter a sessão ativa
@@ -250,22 +250,22 @@ window.addEventListener("load", () => {
   }
 });
 
-// Dispara chamada na ChamadaTV passando só a senha
+// Dispara CHAMADA (já atualiza Pacientes e ChamadaTV)
 async function chamarPaciente(senha) {
   const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
   try {
     const resp = await fetch(
       `${WEB_APP_URL}?action=registrarChamadaTV`
-      + `&senha=${encodeURIComponent(senha)}`
-      + `&maquina=${encodeURIComponent(maquina)}`
+       `&senha=${encodeURIComponent(senha)}`
+       `&maquina=${encodeURIComponent(maquina)}`
     );
-    const result = await resp.json();
-    if (result.success) {
-      mostrarMensagem("Chamada registrada com sucesso.");
-    } else {
-      alert("Erro ao registrar chamada: " + result.message);
-    }
+    const { success } = await resp.json();
+    if (!success) throw new Error("falha ao chamar");
+
+    mostrarMensagem("Paciente agora em atendimento.");
+    // Recarrega e vai manter “Em atendimento” no front:
+    await carregarSenhas();
   } catch (err) {
-    alert("Erro na conexão: " + err.message);
+    alert("Erro ao chamar paciente: " + err.message);
   }
 }
