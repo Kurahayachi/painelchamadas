@@ -45,33 +45,31 @@ function render() {
   tbody.innerHTML = "";
   senhas.forEach(({ senha, data, status }) => {
     const tr = document.createElement("tr");
+    const isTriagem = status.trim() === "Em triagem";
 
-    // 1) destaca linha em triagem
-    if (status === "Em triagem") {
-      tr.classList.add("em-triagem");
-    }
+    // 1) destaque de linha
+    if (isTriagem) tr.classList.add("em-triagem");
 
-    // 2) monta sempre o botão Chamar (ou Re-Chamar)
+    // 2) monta sempre o botão Chamar/Re-Chamar
     let botoes = `
       <button class="btn-chamar chamarBtn" data-senha="${senha}">
-        ${status === "Em triagem" ? "🔔 Re-Chamar" : "📣 Chamar"}
+        ${isTriagem ? "🔔 Re-Chamar" : "📣 Chamar"}
       </button>
       <button class="btn-primario editarBtn" data-senha="${senha}">Editar</button>
       <button class="btn-perigo" onclick="excluirSenha('${senha}')">Excluir</button>
     `;
-
-    // 3) só adiciona “Finalizar” se estiver em triagem
-    if (status === "Em triagem") {
+    // 3) só “Finalizar” em triagem
+    if (isTriagem) {
       botoes += `<button class="btn-finalizar" onclick="finalizarTriagem('${senha}')">
                    Finalizar Classificação
                  </button>`;
     }
 
-    // 4) renderiza as células
+    // 4) renderiza a linha
     tr.innerHTML = `
       <td>${senha}</td>
       <td>${new Date(data).toLocaleString()}</td>
-      <td>${status}</td>
+      <td class="${isTriagem ? "status-em-triagem" : ""}">${status}</td>
       <td>${botoes}</td>
     `;
     tbody.appendChild(tr);
@@ -278,6 +276,7 @@ async function chamarPaciente(senha) {
     const result = await resp.json();
     if (result.success) {
       mostrarMensagem("Chamada registrada com sucesso.");
++     await carregarSenhas(); // força re-render para aplicar o destaque
     } else {
       alert("Erro ao registrar chamada: " + result.message);
     }
@@ -285,3 +284,4 @@ async function chamarPaciente(senha) {
     alert("Erro na conexão: " + err.message);
   }
 }
+
