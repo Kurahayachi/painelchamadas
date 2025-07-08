@@ -5,7 +5,7 @@
  * Uso interno permitido mediante autorização do autor.
  */
 
-const WEB_APP_URL_R       = "https://script.google.com/macros/s/AKfycbwI3oGrM5o_yagDMqpxPm_iY2Jwg1-M_VvSdcTmP6Vl2TW_kS-gziKHUWHz6ZOQ_IXgXQ/exec";
+const WEB_APP_URL_R       = "https://script.google.com/macros/s/AKfycbyXg2rm8ZetWwSqUq4JBVgzVBtskHVDEFFq5lDTdHKWCIMom33xImLWrv-vhaai-pMi7g/exec";
 const STORAGE_KEY_R = "ultimaAtualizacaoRecepcao";  // combina O2 + Q2
 const POLLING_INTERVAL_R  = 10000;
 
