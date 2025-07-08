@@ -4,8 +4,8 @@
  * Todos os direitos reservados.
  * Uso interno permitido mediante autorização do autor.
  */
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzkGO_7tbXmxgEnQYev1hkmhDeCfC8QSEto3_6rcAVRDN5mBQIP1Ij-s14Y5d-0GySu/exec";
-const STORAGE_KEY = "ultimaAtualizacaoTotem";    // L2 ISO
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzIRs61gAFVFJCBbAsJ-AgYqzXib0qV8OucMdjWqwtJvpyVSsNYPa_JW9JZdpZ2y7we/exec";
+const STORAGE_KEY = "ultimaAtualizacaoClassificacao";    // combina L2 + O2
 
 // Auto-reload a cada 15 minutos para manter a sessão ativa
 setInterval(() => {
