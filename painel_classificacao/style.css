@@ -235,6 +235,26 @@ button {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
+/* --- Destaque para “Em triagem” --- */
+/* Fundo suave para toda a linha */
+tr.em-triagem td {
+  background-color: rgba(255, 0, 0, 0.1);
+}
+
+/* Opcional: destaca o texto do status em triagem */
+td.status-em-triagem {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+/* (Se você implementou o botão “Re-Chamar”) */
+/* Botão chamar fica cinza, mas ainda clicável */
+.btn-chamar.chamado {
+  background-color: #ccc;
+  color: #666;
+}
+
+
 html, body {
   height: 100%;
   display: flex;

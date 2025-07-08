@@ -45,16 +45,29 @@ function render() {
   tbody.innerHTML = "";
   senhas.forEach(({ senha, data, status }) => {
     const tr = document.createElement("tr");
-    let botoes = "";
+
+    // 1) destaca linha em triagem
     if (status === "Em triagem") {
-      botoes = `<button class=\"btn-finalizar\" onclick=\"finalizarTriagem('${senha}')\">Finalizar Classificação</button>`;
-    } else {
-      botoes = `
-        <button class=\"btn-chamar chamarBtn\" data-senha=\"${senha}\">📣 Chamar</button>
-        <button class=\"btn-primario editarBtn\" data-senha=\"${senha}\">Editar</button>
-        <button class=\"btn-perigo\" onclick=\"excluirSenha('${senha}')\">Excluir</button>
-      `;
+      tr.classList.add("em-triagem");
     }
+
+    // 2) monta sempre o botão Chamar (ou Re-Chamar)
+    let botoes = `
+      <button class="btn-chamar chamarBtn" data-senha="${senha}">
+        ${status === "Em triagem" ? "🔔 Re-Chamar" : "📣 Chamar"}
+      </button>
+      <button class="btn-primario editarBtn" data-senha="${senha}">Editar</button>
+      <button class="btn-perigo" onclick="excluirSenha('${senha}')">Excluir</button>
+    `;
+
+    // 3) só adiciona “Finalizar” se estiver em triagem
+    if (status === "Em triagem") {
+      botoes += `<button class="btn-finalizar" onclick="finalizarTriagem('${senha}')">
+                   Finalizar Classificação
+                 </button>`;
+    }
+
+    // 4) renderiza as células
     tr.innerHTML = `
       <td>${senha}</td>
       <td>${new Date(data).toLocaleString()}</td>
@@ -63,8 +76,12 @@ function render() {
     `;
     tbody.appendChild(tr);
   });
-  document.querySelectorAll(".chamarBtn").forEach(btn => btn.addEventListener("click", () => chamarPaciente(btn.dataset.senha)));
-  document.querySelectorAll(".editarBtn").forEach(btn => btn.addEventListener("click", () => abrirModal(btn.dataset.senha)));
+
+  // reaplica listeners
+  document.querySelectorAll(".chamarBtn")
+    .forEach(btn => btn.addEventListener("click", () => chamarPaciente(btn.dataset.senha)));
+  document.querySelectorAll(".editarBtn")
+    .forEach(btn => btn.addEventListener("click", () => abrirModal(btn.dataset.senha)));
 }
 
 async function carregarSenhas() {
