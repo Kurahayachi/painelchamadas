@@ -9,7 +9,7 @@ const WEB_APP_URL_R       = "https://script.google.com/macros/s/AKfycbyXg2rm8Zet
 const STORAGE_KEY_R = "ultimaAtualizacaoRecepcao";  // combina O2 + Q2
 const POLLING_INTERVAL_R  = 10000;
 
-// Notificador visual exclusivo para o Painel Recepção
+// Notificador visual exclusivo para o Painel Recepção testando...
 const notificadorR = document.createElement('div');
 notificadorR.id = 'notificador';
 document.body.appendChild(notificadorR);
