@@ -5,7 +5,7 @@
  * Uso interno permitido mediante autorização do autor.
  */
 
-const WEB_APP_URL_R       = "https://script.google.com/macros/s/AKfycbx_AWKTM9IK7YbfnLsaAkOrKYoSg0jIvCBnI1YWIikIBoZDUjY1T7ImaoXh5P4eAuoqIQ/exec";
+const WEB_APP_URL_R       = "https://script.google.com/macros/s/AKfycbyUwBN1rTqRTK2xnI-mLcgF1BhugSHP8ZqlvuIE059mQPYHzeCIa4tJtQM0Naz_w0kqxA/exec";
 const STORAGE_KEY_R = "ultimaAtualizacaoRecepcao";  // combina O2 + Q2
 const POLLING_INTERVAL_R  = 10000;
 
@@ -50,20 +50,27 @@ async function carregarSenhasRecepcao() {
 function renderRecepcao() {
   tbodyR.innerHTML = "";
   senhasR.forEach(({ senha, data, nome, status }) => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${senha}</td>
-      <td>${new Date(data).toLocaleString()}</td>
-      <td>${nome}</td>
-      <td>${status}</td>
-      <td>
-        <button class="btn-primario chamarBtn" data-senha="${senha}">📣 Chamar</button>
-        <button class="btn-finalizar finalizarBtn" data-senha="${senha}">Finalizar</button>
-        <button class="btn-perigo excluirBtn" data-senha="${senha}">Excluir</button>
-      </td>
-    `;
-    tbodyR.appendChild(tr);
-  });
+  const tr = document.createElement("tr");
+
+  // 🔴 Destacar "Em atendimento"
+  if (status === "Em atendimento") {
+    tr.style.backgroundColor = "#ffe5e5";
+  }
+
+  tr.innerHTML = `
+    <td>${senha}</td>
+    <td>${new Date(data).toLocaleString()}</td>
+    <td>${nome}</td>
+    <td>${status}</td>
+    <td>
+      <button class="btn-primario chamarBtn" data-senha="${senha}">📣 Chamar</button>
+      <button class="btn-finalizar finalizarBtn" data-senha="${senha}">Finalizar</button>
+      <button class="btn-perigo excluirBtn" data-senha="${senha}">Excluir</button>
+    </td>
+  `;
+  tbodyR.appendChild(tr);
+});
+
   // Aplica listeners corretos para as funções existentes
   document.querySelectorAll(".chamarBtn").forEach(btn => btn.addEventListener("click", () => chamarPaciente(btn.dataset.senha)));
   document.querySelectorAll(".finalizarBtn").forEach(btn => btn.addEventListener("click", () => abrirModalConfirmar(btn.dataset.senha)));
@@ -75,18 +82,37 @@ setInterval(carregarSenhasRecepcao, POLLING_INTERVAL_R);
 
 async function chamarPaciente(senha) {
   const maquina = localStorage.getItem("maquinaSelecionada") || "Recepção 01";
+
   try {
-    const resp = await fetch(
+    // 1. Atualiza status para "Em atendimento" e grava Q2
+    const respChamar = await fetch(
+      `${WEB_APP_URL_R}?action=chamar`
+      + `&senha=${encodeURIComponent(senha)}`
+      + `&maquina=${encodeURIComponent(maquina)}`
+    );
+    const resultChamar = await respChamar.json();
+
+    if (!resultChamar.success) {
+      alert("Erro ao marcar como 'Em atendimento': " + resultChamar.message);
+      return;
+    }
+
+    // 2. Grava na aba ChamadaTV
+    const respTV = await fetch(
       `${WEB_APP_URL_R}?action=registrarChamadaTV`
       + `&senha=${encodeURIComponent(senha)}`
       + `&maquina=${encodeURIComponent(maquina)}`
     );
-    const result = await resp.json();
-    if (result.success) {
+    const resultTV = await respTV.json();
+
+    if (resultTV.success) {
       mostrarMensagemRecepcao("Chamada registrada com sucesso.");
+      isFirstLoadR = true;
+      carregarSenhasRecepcao(); // 🔁 força atualização após chamar
     } else {
-      alert("Erro ao chamar: " + result.message);
+      alert("Erro ao registrar na TV: " + resultTV.message);
     }
+
   } catch (err) {
     alert("Erro na conexão: " + err.message);
   }
