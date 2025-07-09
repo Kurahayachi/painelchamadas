@@ -6,9 +6,9 @@
  */
 
 const WEB_APP_URL =
-    "https://script.google.com/macros/s/AKfycbyQlMNubMVbcAfZHGAS7ubRaP0N-AOS0GM5mxUYLkhssCNitoqeJcYUGPgUNn1SfE7U/exec";
+    "https://script.google.com/macros/s/AKfycbzMHQenSzOspW-ko2pBUnnU0GUUDWI8MYNplBR-UCJIAMstJTrqryZDEeYk2FA2BgJJ/exec";
 
-// Auto-reload a cada 15 minutos para manter a sessão ativa testenado
+// Auto-reload a cada 15 minutos para manter a sessão ativa
 setInterval(() => {
     console.log("⏳ 15 minutos se passaram, recarregando o painel de médico...");
     location.reload();
@@ -65,7 +65,7 @@ salvarMaquinaBtn.addEventListener("click", () => {
   if (!sel) { alert("Selecione um consultório."); return; }
   consultorioSelecionado = sel.value;
   localStorage.setItem("consultorioSelecionado", consultorioSelecionado);
-  spanMaquina.textContent = `(Consultório atual: ${consultorioSelecionado})`;
+  spanMaquina.textContent = (Consultório atual: ${consultorioSelecionado});
   modalMaquina.classList.remove("show");
   carregarSenhas();
 });
@@ -97,9 +97,9 @@ function render() {
       especialidadesSelecionadas.includes(s.especialidade)
     )
     .forEach(({ senha, nome, idade, data, status, especialidade, cor }) => {
-      const corClasse = `cor-${(cor||"").trim().replace(/\s+/g,"")}`;
+      const corClasse = cor-${(cor||"").trim().replace(/\s+/g,"")};
       const tr = document.createElement("tr");
-      tr.innerHTML = `
+      tr.innerHTML = 
         <td>${senha}</td>
         <td>${nome||"-"}</td>
         <td>${idade||"-"}</td>
@@ -112,7 +112,7 @@ function render() {
           <button class="btn-finalizar" onclick="abrirModalConfirmar('${senha}')">Finalizar</button>
         </td>
 
-      `;
+      ;
       tbody.appendChild(tr);
     });
 }
@@ -124,7 +124,7 @@ async function chamarPaciente(senha) {
 
   try {
     const resp = await fetch(
-      `${WEB_APP_URL}?action=registrarChamadaTV&senha=${encodeURIComponent(senha)}&consultorio=${encodeURIComponent(consultorioSelecionado)}`
+      ${WEB_APP_URL}?action=registrarChamadaTV&senha=${encodeURIComponent(senha)}&consultorio=${encodeURIComponent(consultorioSelecionado)}
     );
     const result = await resp.json();
     if (result.success) {
@@ -150,7 +150,7 @@ async function finalizarTriagemModal() {
 
   try {
     const resp = await fetch(
-      `${WEB_APP_URL}?action=liberar&senha=${encodeURIComponent(senhaSelecionada)}&consultorio=${encodeURIComponent(consultorioSelecionado)}`
+      ${WEB_APP_URL}?action=liberar&senha=${encodeURIComponent(senhaSelecionada)}&consultorio=${encodeURIComponent(consultorioSelecionado)}
     );
     const result = await resp.json();
     if (result.success) {
@@ -169,14 +169,14 @@ async function finalizarTriagemModal() {
 
 async function carregarSenhas() {
   try {
-    const url = `${WEB_APP_URL}?action=listar${ultimaLeitura ? `&timestamp=${encodeURIComponent(ultimaLeitura)}` : ""}`;
+    const url = ${WEB_APP_URL}?action=listar${ultimaLeitura ? &timestamp=${encodeURIComponent(ultimaLeitura)} : ""};
     const resp = await fetch(url);
     const result = await resp.json();
     if (!result.atualizacao) {
-      console.log(`[${new Date().toLocaleTimeString()}] Nenhuma atualização detectada.`);
+      console.log([${new Date().toLocaleTimeString()}] Nenhuma atualização detectada.);
       return;
     }
-    console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada! timestamp: ${result.ultimaLeitura}`);
+    console.log([${new Date().toLocaleTimeString()}] Atualização detectada! timestamp: ${result.ultimaLeitura});
     senhas = result.senhas;
     ultimaLeitura = result.ultimaLeitura;
     render();
@@ -188,7 +188,7 @@ async function carregarSenhas() {
 window.addEventListener("load", async () => {
   consultorioSelecionado = localStorage.getItem("consultorioSelecionado") || "";
   if (consultorioSelecionado) {
-    spanMaquina.textContent = `(Consultório atual: ${consultorioSelecionado})`;
+    spanMaquina.textContent = (Consultório atual: ${consultorioSelecionado});
   }
 
   window.chamarPaciente = chamarPaciente;
@@ -202,5 +202,4 @@ window.addEventListener("load", async () => {
   setInterval(carregarSenhas, 10000);
 
 });
-
 
