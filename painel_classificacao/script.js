@@ -4,7 +4,7 @@
  * Todos os direitos reservados.
  * Uso interno permitido mediante autorização do autor.
  */
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxAmklkimnDdT6Ys3gRiLrPLRAhD1CsrZVXSi-dIEp7XlKhuB-zn-cj1jnZcMwovjpw/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx6HBzdYAIeB6Pihyl-G4F-jVpbYU6LbwYAnED2M-iAyHvjFIFS7WjJzNLoJgkGjA3m/exec";
 const STORAGE_KEY = "ultimaAtualizacaoClassificacao";    // combina L2 + O2
 
 // Auto-reload a cada 15 minutos para manter a sessão ativa
@@ -80,21 +80,33 @@ function render() {
 async function carregarSenhas() {
   const tsCliente = isFirstLoad ? "" : ultimaLeitura;
   const url = `${WEB_APP_URL}?action=listar&timestampCliente=${encodeURIComponent(tsCliente)}`;
-  const resp = await fetch(url);
-  const result = await resp.json();
-  isFirstLoad = false;
 
-  if (!result.atualizacao) {
-    console.log(`[${new Date().toLocaleTimeString()}] Nenhuma atualização detectada.`);
-    return;
+  try {
+    const resp = await fetch(url);
+    const result = await resp.json();
+    isFirstLoad = false;
+
+    if (!result.atualizacao) {
+      console.log(`[${new Date().toLocaleTimeString()}] Nenhuma atualização detectada.`);
+      return;
+    }
+
+    const iso = result.ultimaAtualizacao || "N/A";
+    console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada! ISO: ${iso}`);
+
+    if (result.ultimaAtualizacao) {
+      ultimaLeitura = result.ultimaAtualizacao;
+      localStorage.setItem(STORAGE_KEY, ultimaLeitura);
+    }
+
+    if (Array.isArray(result.senhas)) {
+      senhas = result.senhas;
+      render();
+    }
+
+  } catch (error) {
+    console.error("Erro na conexão:", error);
   }
-
-  console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada! ISO:`, result.ultimaAtualizacao);
-
-  ultimaLeitura = result.ultimaAtualizacao;
-  localStorage.setItem(STORAGE_KEY, ultimaLeitura);
-  senhas = result.senhas;
-  render();
 }
 
 // Inicia painel de classificação
