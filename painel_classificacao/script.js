@@ -90,26 +90,24 @@ async function carregarSenhas() {
       console.log(`[${new Date().toLocaleTimeString()}] Nenhuma atualização detectada.`);
       return;
     }
-    
 
-    if (result.ultimaAtualizacao) {
-      console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada! ISO: ${result.ultimaAtualizacao}`);
+    if (result.ultimaAtualizacao && result.ultimaAtualizacao !== ultimaLeitura) {
+      console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada! Novo timestamp: ${result.ultimaAtualizacao}`);
       ultimaLeitura = result.ultimaAtualizacao;
       localStorage.setItem(STORAGE_KEY, ultimaLeitura);
-    } else {
-      console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada, mas sem timestamp válido.`);
-    }
 
-    if (Array.isArray(result.senhas)) {
-      senhas = result.senhas;
-      render();
+      if (Array.isArray(result.senhas)) {
+        senhas = result.senhas;
+        render();
+      }
+    } else {
+      console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada, mas timestamp não mudou.`);
     }
 
   } catch (error) {
     console.error("Erro na conexão:", error);
   }
 }
-
 
 // Inicia painel de classificação
 carregarSenhas();  // corrigido de tocarSenhas()
