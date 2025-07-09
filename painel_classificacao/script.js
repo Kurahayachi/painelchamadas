@@ -4,7 +4,7 @@
  * Todos os direitos reservados.
  * Uso interno permitido mediante autorização do autor.
  */
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxqAJDdjhye6iu5QYA6f6iu-Wd2IlLXOrm4CYA8GgVKLP6ohjNkWSRRGo7GHKa4n0gh/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwm3CCr-NsvZNiC7hyn1x878YhQ3zUHer3f_awmXuPyz6l7bvUZuUXqFsg5oejIocL5/exec";
 const STORAGE_KEY = "ultimaAtualizacaoClassificacao";    // combina L2 + O2
 
 // Auto-reload a cada 15 minutos para manter a sessão ativa
@@ -199,19 +199,21 @@ async function finalizarTriagem(senha) {
 }
 
 async function excluirSenha(senha) {
-    if (!confirm(`Tem certeza que deseja excluir a senha ${senha}?`)) return;
-    try {
-        const resp = await fetch(`${WEB_APP_URL}?action=excluir&senha=${senha}`);
-        const result = await resp.json();
-        if (result.success) {
-            const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
-            carregarSenhas(maquina);
-        } else {
-            alert("Erro ao excluir senha: " + result.message);
-        }
-    } catch (err) {
-        alert("Erro na conexão: " + err.message);
+  if (!confirm(`Tem certeza que deseja excluir a senha ${senha}?`)) return;
+  try {
+    const resp   = await fetch(`${WEB_APP_URL}?action=excluir&senha=${senha}`);
+    const result = await resp.json();
+    if (result.success) {
+      mostrarMensagem("Senha excluída com sucesso.");
+      // força full-fetch imediato (zera o timestamp e recarrega tudo)
+      isFirstLoad = true;
+      carregarSenhas();
+    } else {
+      alert("Erro ao excluir senha: " + result.message);
     }
+  } catch (err) {
+    alert("Erro na conexão: " + err.message);
+  }
 }
 
 function iniciarAtualizacaoAutomatica() {
