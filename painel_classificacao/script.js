@@ -4,7 +4,7 @@
  * Todos os direitos reservados.
  * Uso interno permitido mediante autorização do autor.
  */
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx6HBzdYAIeB6Pihyl-G4F-jVpbYU6LbwYAnED2M-iAyHvjFIFS7WjJzNLoJgkGjA3m/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxRrNkupZ8DQGhhODTF0Mfvw6M6lyWno-RU_bjGX6MHqS4_s4RsiS8Fnwlv1kESpmcx/exec";
 const STORAGE_KEY = "ultimaAtualizacaoClassificacao";    // combina L2 + O2
 
 // Auto-reload a cada 15 minutos para manter a sessão ativa
@@ -90,13 +90,14 @@ async function carregarSenhas() {
       console.log(`[${new Date().toLocaleTimeString()}] Nenhuma atualização detectada.`);
       return;
     }
-
-    const iso = result.ultimaAtualizacao || "N/A";
-    console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada! ISO: ${iso}`);
+    
 
     if (result.ultimaAtualizacao) {
+      console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada! ISO: ${result.ultimaAtualizacao}`);
       ultimaLeitura = result.ultimaAtualizacao;
       localStorage.setItem(STORAGE_KEY, ultimaLeitura);
+    } else {
+      console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada, mas sem timestamp válido.`);
     }
 
     if (Array.isArray(result.senhas)) {
@@ -108,6 +109,7 @@ async function carregarSenhas() {
     console.error("Erro na conexão:", error);
   }
 }
+
 
 // Inicia painel de classificação
 carregarSenhas();  // corrigido de tocarSenhas()
