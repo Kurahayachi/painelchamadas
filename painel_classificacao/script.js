@@ -4,7 +4,7 @@
  * Todos os direitos reservados.
  * Uso interno permitido mediante autorização do autor.
  */
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw0MPPm7fzVsR6yuh47vQQo44o73j7sujzJf5XMlWDrPbHZTT4DzoFlmVJ6c3uI1PsQ/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzGAl0c0-YBLiz1FiFC_mp8oDO9kRfwbsajeBuJXHF5uIT6KfrH5IgyvX_Nw7ns5hzZ/exec";
 const STORAGE_KEY = "ultimaAtualizacaoClassificacao";    // combina L2 + O2
 
 // Auto-reload a cada 15 minutos para manter a sessão ativa
@@ -45,16 +45,23 @@ function render() {
   tbody.innerHTML = "";
   senhas.forEach(({ senha, data, status }) => {
     const tr = document.createElement("tr");
+    
+    // Destaca visualmente "Em triagem" com fundo vermelho claro
+    if (status === "Em triagem") {
+      tr.style.backgroundColor = "#ffcccc";
+    }
+
     let botoes = "";
     if (status === "Em triagem") {
-      botoes = `<button class=\"btn-finalizar\" onclick=\"finalizarTriagem('${senha}')\">Finalizar Classificação</button>`;
+      botoes = `<button class="btn-finalizar" onclick="finalizarTriagem('${senha}')">Finalizar Classificação</button>`;
     } else {
       botoes = `
-        <button class=\"btn-chamar chamarBtn\" data-senha=\"${senha}\">📣 Chamar</button>
-        <button class=\"btn-primario editarBtn\" data-senha=\"${senha}\">Editar</button>
-        <button class=\"btn-perigo\" onclick=\"excluirSenha('${senha}')\">Excluir</button>
+        <button class="btn-chamar chamarBtn" data-senha="${senha}">📣 Chamar</button>
+        <button class="btn-primario editarBtn" data-senha="${senha}">Editar</button>
+        <button class="btn-perigo" onclick="excluirSenha('${senha}')">Excluir</button>
       `;
     }
+
     tr.innerHTML = `
       <td>${senha}</td>
       <td>${new Date(data).toLocaleString()}</td>
@@ -63,8 +70,11 @@ function render() {
     `;
     tbody.appendChild(tr);
   });
-  document.querySelectorAll(".chamarBtn").forEach(btn => btn.addEventListener("click", () => chamarPaciente(btn.dataset.senha)));
-  document.querySelectorAll(".editarBtn").forEach(btn => btn.addEventListener("click", () => abrirModal(btn.dataset.senha)));
+
+  document.querySelectorAll(".chamarBtn")
+    .forEach(btn => btn.addEventListener("click", () => chamarPaciente(btn.dataset.senha)));
+  document.querySelectorAll(".editarBtn")
+    .forEach(btn => btn.addEventListener("click", () => abrirModal(btn.dataset.senha)));
 }
 
 async function carregarSenhas() {
@@ -111,38 +121,46 @@ function limparFormulario() {
     observacaoInput.value = "";
 }
 
+// 2) salvarDados: só grava dados e recarrega a lista sem status nem passar máquina
 async function salvarDados() {
-    const nome = nomeInput.value.trim();
-    const idade = idadeInput.value.trim();
-    const especialidade = especialidadeInput.value.trim();
-    const cor = corInput.value;
-    const observacao = observacaoInput.value.trim();
-    const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
+  const nome          = nomeInput.value.trim();
+  const idade         = idadeInput.value.trim();
+  const especialidade = especialidadeInput.value.trim();
+  const cor           = corInput.value;
+  const observacao    = observacaoInput.value.trim();
+  const maquina       = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
 
-    if (!nome || !idade || !especialidade || !cor) {
-        alert("Por favor, preencha todos os campos obrigatórios.");
-        return;
+  if (!nome || !idade || !especialidade || !cor) {
+    alert("Por favor, preencha todos os campos obrigatórios.");
+    return;
+  }
+  try {
+    const resp = await fetch(
+      `${WEB_APP_URL}?action=chamar`
+      + `&senha=${encodeURIComponent(senhaSelecionada)}`
+      + `&maquina=${encodeURIComponent(maquina)}`
+      + `&nome=${encodeURIComponent(nome)}`
+      + `&idade=${encodeURIComponent(idade)}`
+      + `&especialidade=${encodeURIComponent(especialidade)}`
+      + `&cor=${encodeURIComponent(cor)}`
+      + `&observacao=${encodeURIComponent(observacao)}`
+    );
+    const result = await resp.json();
+    if (result.success) {
+      mostrarMensagem("Dados salvos com sucesso!");
+      finalizarBtn.disabled = false;
+      // só isso: recarrega usando o timestamp
+      isFirstLoad = false;  // mantém otimização; não precisa full-fetch aqui
+      carregarSenhas();
+    } else {
+      alert("Erro ao salvar dados: " + result.message);
     }
-
-    try {
-        const resp = await fetch(`${WEB_APP_URL}?action=chamar&senha=${encodeURIComponent(senhaSelecionada)}&maquina=${encodeURIComponent(maquina)}&nome=${encodeURIComponent(nome)}&idade=${encodeURIComponent(idade)}&especialidade=${encodeURIComponent(especialidade)}&cor=${encodeURIComponent(cor)}&observacao=${encodeURIComponent(observacao)}`);
-        const result = await resp.json();
-        if (result.success) {
-            mostrarMensagem("Dados salvos com sucesso!");
-            finalizarBtn.disabled = false;
-
-            // 🚀 Atualiza a lista sem F5 (mantendo otimização)
-            carregarSenhas(maquina);
-        } else {
-            alert("Erro ao salvar dados: " + result.message);
-        }
-    } catch (err) {
-        alert("Erro na conexão: " + err.message);
-    }
+  } catch (err) {
+    alert("Erro na conexão: " + err.message);
+  }
 }
 
 async function finalizarTriagemModal() {
-  const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
   try {
     const resp = await fetch(
       `${WEB_APP_URL}?action=finalizarTriagem&senha=${encodeURIComponent(senhaSelecionada)}`
@@ -152,10 +170,10 @@ async function finalizarTriagemModal() {
       mostrarMensagem("Classificação finalizada.");
       modal.classList.remove("show");
 
-      // ——— FORÇA RECARREGAR TUDO ———
-      isFirstLoad = true;       // na próxima chamada, timestampCliente será ""
-      carregarSenhas();         // dispara um GET completo
-      // ————————————————
+      // ——— FORÇA ATUALIZAÇÃO IMEDIATA ———
+      isFirstLoad = true;   // zera o timestampCliente para fetch completo
+      carregarSenhas();     // atualiza agora, removendo a linha
+      // ——————————————————————————
     } else {
       alert("Erro ao finalizar triagem: " + result.message);
     }
@@ -164,20 +182,24 @@ async function finalizarTriagemModal() {
   }
 }
 
+// 3) finalizarTriagem “direto” também força full-fetch
 async function finalizarTriagem(senha) {
-    const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
-    try {
-        const resp = await fetch(`${WEB_APP_URL}?action=finalizarTriagem&senha=${encodeURIComponent(senha)}`);
-        const result = await resp.json();
-        if (result.success) {
-            mostrarMensagem("Classificação finalizada.");
-            carregarSenhas(maquina);
-        } else {
-            alert("Erro ao finalizar triagem: " + result.message);
-        }
-    } catch (err) {
-        alert("Erro na conexão: " + err.message);
+  try {
+    const resp   = await fetch(
+      `${WEB_APP_URL}?action=finalizarTriagem&senha=${encodeURIComponent(senha)}`
+    );
+    const result = await resp.json();
+    if (result.success) {
+      mostrarMensagem("Classificação finalizada.");
+      // força full-fetch pra sumir a linha agora
+      isFirstLoad = true;
+      carregarSenhas();
+    } else {
+      alert("Erro ao finalizar triagem: " + result.message);
     }
+  } catch (err) {
+    alert("Erro na conexão: " + err.message);
+  }
 }
 
 async function excluirSenha(senha) {
@@ -249,11 +271,11 @@ window.addEventListener("load", () => {
   }
 });
 
-// Dispara chamada na ChamadaTV passando só a senha
+// 1) chamarPaciente: grava na TV e já recarrega sem esperar o polling
 async function chamarPaciente(senha) {
   const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
   try {
-    const resp = await fetch(
+    const resp   = await fetch(
       `${WEB_APP_URL}?action=registrarChamadaTV`
       + `&senha=${encodeURIComponent(senha)}`
       + `&maquina=${encodeURIComponent(maquina)}`
@@ -261,6 +283,9 @@ async function chamarPaciente(senha) {
     const result = await resp.json();
     if (result.success) {
       mostrarMensagem("Chamada registrada com sucesso.");
+      // força full-fetch
+      isFirstLoad = true;
+      carregarSenhas();
     } else {
       alert("Erro ao registrar chamada: " + result.message);
     }
