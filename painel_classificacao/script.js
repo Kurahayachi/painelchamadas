@@ -4,7 +4,7 @@
  * Todos os direitos reservados.
  * Uso interno permitido mediante autorização do autor.
  */
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzXYuVNY7ytdEJ7AT0eklhC5-8AqEUT53yfU_YcqU2X2dKCkGu14y4C-TVFFE7r8oPt/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyLFbJKzvW7v5P1wYhG7zcCZYQMfIShHwa78w8GN9LrEXZooSOQ7FSevSconxO6FpIx/exec";
 const STORAGE_KEY = "ultimaAtualizacaoClassificacao";    // combina L2 + O2
 
 // Auto-reload a cada 15 minutos para manter a sessão ativa
