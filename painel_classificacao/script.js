@@ -78,36 +78,35 @@ function render() {
 }
 
 async function carregarSenhas() {
-  const tsCliente = isFirstLoad ? "" : ultimaLeitura;
-  const url = `${WEB_APP_URL}?action=listar&timestampCliente=${encodeURIComponent(tsCliente)}`;
+  const url = `${WEB_APP_URL}?action=listar&timestampCliente=${encodeURIComponent(ultimaLeitura || "")}`;
 
   try {
     const resp = await fetch(url);
     const result = await resp.json();
 
-    if (!result.atualizacao) {
+    // Se não há atualização e não é a primeira vez, sai
+    if (!result.atualizacao && !isFirstLoad) {
       console.log(`[${new Date().toLocaleTimeString()}] Nenhuma atualização detectada.`);
       return;
     }
 
-    if (result.ultimaAtualizacao && (isFirstLoad || result.ultimaAtualizacao !== ultimaLeitura)) {
-      console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada! Novo timestamp: ${result.ultimaAtualizacao}`);
+    // Atualiza timestamp e salva localStorage
+    if (result.ultimaAtualizacao) {
+      console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada! Timestamp: ${result.ultimaAtualizacao}`);
       ultimaLeitura = result.ultimaAtualizacao;
       localStorage.setItem(STORAGE_KEY, ultimaLeitura);
+    }
 
-      if (Array.isArray(result.senhas)) {
-        senhas = result.senhas;
-        render();
-      }
-
-      isFirstLoad = false;  // ✅ Só aqui, depois de forçar render
-    } else {
-      console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada, mas timestamp não mudou.`);
-      isFirstLoad = false;  // ✅ Aqui também para garantir que não fique sempre true
+    // Renderiza a lista se houver dados
+    if (Array.isArray(result.senhas)) {
+      senhas = result.senhas;
+      render();
     }
 
   } catch (error) {
     console.error("Erro na conexão:", error);
+  } finally {
+    isFirstLoad = false; // ✅ sempre no final
   }
 }
 
