@@ -4,7 +4,7 @@
  * Todos os direitos reservados.
  * Uso interno permitido mediante autorização do autor.
  */
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzIRs61gAFVFJCBbAsJ-AgYqzXib0qV8OucMdjWqwtJvpyVSsNYPa_JW9JZdpZ2y7we/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzRe7jYAxUGUBHETlziaXi_CFMPcjEWGOmm_OazOnsOwgUuUUODp_50taFH_1yPo-dL/exec";
 const STORAGE_KEY = "ultimaAtualizacaoClassificacao";    // combina L2 + O2
 
 // Auto-reload a cada 15 minutos para manter a sessão ativa
@@ -45,14 +45,20 @@ function render() {
   tbody.innerHTML = "";
   senhas.forEach(({ senha, data, status }) => {
     const tr = document.createElement("tr");
+
+    // ⬇️ NOVO: Fundo vermelho se já estiver em triagem ⬇️
+    if (status === "Em triagem") {
+      tr.style.backgroundColor = "#ffcccc";
+    }
+
     let botoes = "";
     if (status === "Em triagem") {
-      botoes = `<button class=\"btn-finalizar\" onclick=\"finalizarTriagem('${senha}')\">Finalizar Classificação</button>`;
+      botoes = `<button class="btn-finalizar" onclick="finalizarTriagem('${senha}')">Finalizar Classificação</button>`;
     } else {
       botoes = `
-        <button class=\"btn-chamar chamarBtn\" data-senha=\"${senha}\">📣 Chamar</button>
-        <button class=\"btn-primario editarBtn\" data-senha=\"${senha}\">Editar</button>
-        <button class=\"btn-perigo\" onclick=\"excluirSenha('${senha}')\">Excluir</button>
+        <button class="btn-chamar chamarBtn" data-senha="${senha}">📣 Chamar</button>
+        <button class="btn-primario editarBtn" data-senha="${senha}">Editar</button>
+        <button class="btn-perigo" onclick="excluirSenha('${senha}')">Excluir</button>
       `;
     }
     tr.innerHTML = `
@@ -63,6 +69,7 @@ function render() {
     `;
     tbody.appendChild(tr);
   });
+
   document.querySelectorAll(".chamarBtn").forEach(btn => btn.addEventListener("click", () => chamarPaciente(btn.dataset.senha)));
   document.querySelectorAll(".editarBtn").forEach(btn => btn.addEventListener("click", () => abrirModal(btn.dataset.senha)));
 }
@@ -255,12 +262,17 @@ async function chamarPaciente(senha) {
   try {
     const resp = await fetch(
       `${WEB_APP_URL}?action=registrarChamadaTV`
-      + `&senha=${encodeURIComponent(senha)}`
-      + `&maquina=${encodeURIComponent(maquina)}`
+       `&senha=${encodeURIComponent(senha)}`
+       `&maquina=${encodeURIComponent(maquina)}`
     );
     const result = await resp.json();
     if (result.success) {
       mostrarMensagem("Chamada registrada com sucesso.");
+
+      // 🚀 Atualização imediata após clique em chamar
+      isFirstLoad = true;
+      carregarSenhas();
+
     } else {
       alert("Erro ao registrar chamada: " + result.message);
     }
@@ -268,3 +280,4 @@ async function chamarPaciente(senha) {
     alert("Erro na conexão: " + err.message);
   }
 }
+
