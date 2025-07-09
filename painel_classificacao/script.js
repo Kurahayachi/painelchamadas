@@ -262,8 +262,8 @@ async function chamarPaciente(senha) {
   try {
     const resp = await fetch(
       `${WEB_APP_URL}?action=registrarChamadaTV`
-       `&senha=${encodeURIComponent(senha)}`
-       `&maquina=${encodeURIComponent(maquina)}`
+      + `&senha=${encodeURIComponent(senha)}`
+      + `&maquina=${encodeURIComponent(maquina)}`
     );
     const result = await resp.json();
     if (result.success) {
@@ -272,7 +272,7 @@ async function chamarPaciente(senha) {
       // 🚀 Atualização imediata após clique em chamar
       isFirstLoad = true;
       carregarSenhas();
-
+      
     } else {
       alert("Erro ao registrar chamada: " + result.message);
     }
@@ -280,4 +280,5 @@ async function chamarPaciente(senha) {
     alert("Erro na conexão: " + err.message);
   }
 }
+
 
