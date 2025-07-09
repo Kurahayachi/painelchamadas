@@ -45,22 +45,18 @@ function render() {
   tbody.innerHTML = "";
   senhas.forEach(({ senha, data, status }) => {
     const tr = document.createElement("tr");
-    
-    // Destaca visualmente "Em triagem" com fundo vermelho claro
+
+    // Destaca quem já está em triagem
     if (status === "Em triagem") {
       tr.style.backgroundColor = "#ffcccc";
     }
 
-    let botoes = "";
-    if (status === "Em triagem") {
-      botoes = `<button class="btn-finalizar" onclick="finalizarTriagem('${senha}')">Finalizar Classificação</button>`;
-    } else {
-      botoes = `
-        <button class="btn-chamar chamarBtn" data-senha="${senha}">📣 Chamar</button>
-        <button class="btn-primario editarBtn" data-senha="${senha}">Editar</button>
-        <button class="btn-perigo" onclick="excluirSenha('${senha}')">Excluir</button>
-      `;
-    }
+    // Sempre mostra só Chamar / Editar / Excluir
+    const botoes = `
+      <button class="btn-chamar chamarBtn" data-senha="${senha}">📣 Chamar</button>
+      <button class="btn-primario editarBtn" data-senha="${senha}">Editar</button>
+      <button class="btn-perigo" onclick="excluirSenha('${senha}')">Excluir</button>
+    `;
 
     tr.innerHTML = `
       <td>${senha}</td>
