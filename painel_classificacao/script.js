@@ -4,7 +4,7 @@
  * Todos os direitos reservados.
  * Uso interno permitido mediante autorização do autor.
  */
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwcXLgB1UND4QGdMWl-ff5u7q4aEfGwgPKB6plzcIu6sLndSHZlBmQN8dh8njA9vYAs/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw0MPPm7fzVsR6yuh47vQQo44o73j7sujzJf5XMlWDrPbHZTT4DzoFlmVJ6c3uI1PsQ/exec";
 const STORAGE_KEY = "ultimaAtualizacaoClassificacao";    // combina L2 + O2
 
 // Auto-reload a cada 15 minutos para manter a sessão ativa
@@ -45,19 +45,16 @@ function render() {
   tbody.innerHTML = "";
   senhas.forEach(({ senha, data, status }) => {
     const tr = document.createElement("tr");
-
-    // ⬇️ Destaque visual para "Em triagem"
+    let botoes = "";
     if (status === "Em triagem") {
-      tr.style.backgroundColor = "#ffcccc";
+      botoes = `<button class=\"btn-finalizar\" onclick=\"finalizarTriagem('${senha}')\">Finalizar Classificação</button>`;
+    } else {
+      botoes = `
+        <button class=\"btn-chamar chamarBtn\" data-senha=\"${senha}\">📣 Chamar</button>
+        <button class=\"btn-primario editarBtn\" data-senha=\"${senha}\">Editar</button>
+        <button class=\"btn-perigo\" onclick=\"excluirSenha('${senha}')\">Excluir</button>
+      `;
     }
-
-    // ⬇️ Sempre exibe os três botões
-    let botoes = `
-      <button class="btn-chamar chamarBtn" data-senha="${senha}">📣 Chamar</button>
-      <button class="btn-primario editarBtn" data-senha="${senha}">Editar</button>
-      <button class="btn-perigo" onclick="excluirSenha('${senha}')">Excluir</button>
-    `;
-
     tr.innerHTML = `
       <td>${senha}</td>
       <td>${new Date(data).toLocaleString()}</td>
@@ -66,48 +63,28 @@ function render() {
     `;
     tbody.appendChild(tr);
   });
-
-  // Reatribui eventos aos botões dinâmicos
-  document.querySelectorAll(".chamarBtn").forEach(btn =>
-    btn.addEventListener("click", () => chamarPaciente(btn.dataset.senha))
-  );
-
-  document.querySelectorAll(".editarBtn").forEach(btn =>
-    btn.addEventListener("click", () => abrirModal(btn.dataset.senha))
-  );
+  document.querySelectorAll(".chamarBtn").forEach(btn => btn.addEventListener("click", () => chamarPaciente(btn.dataset.senha)));
+  document.querySelectorAll(".editarBtn").forEach(btn => btn.addEventListener("click", () => abrirModal(btn.dataset.senha)));
 }
 
 async function carregarSenhas() {
-  const url = `${WEB_APP_URL}?action=listar&timestampCliente=${encodeURIComponent(ultimaLeitura || "")}`;
+  const tsCliente = isFirstLoad ? "" : ultimaLeitura;
+  const url = `${WEB_APP_URL}?action=listar&timestampCliente=${encodeURIComponent(tsCliente)}`;
+  const resp = await fetch(url);
+  const result = await resp.json();
+  isFirstLoad = false;
 
-  try {
-    const resp = await fetch(url);
-    const result = await resp.json();
-
-    // Se não há atualização e não é a primeira vez, sai
-    if (!result.atualizacao && !isFirstLoad) {
-      console.log(`[${new Date().toLocaleTimeString()}] Nenhuma atualização detectada.`);
-      return;
-    }
-
-    // Atualiza timestamp e salva localStorage
-    if (result.ultimaAtualizacao) {
-      console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada! Timestamp: ${result.ultimaAtualizacao}`);
-      ultimaLeitura = result.ultimaAtualizacao;
-      localStorage.setItem(STORAGE_KEY, ultimaLeitura);
-    }
-
-    // Renderiza a lista se houver dados
-    if (Array.isArray(result.senhas)) {
-      senhas = result.senhas;
-      render();
-    }
-
-  } catch (error) {
-    console.error("Erro na conexão:", error);
-  } finally {
-    isFirstLoad = false; // ✅ sempre no final
+  if (!result.atualizacao) {
+    console.log(`[${new Date().toLocaleTimeString()}] Nenhuma atualização detectada.`);
+    return;
   }
+
+  console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada! ISO:`, result.ultimaAtualizacao);
+
+  ultimaLeitura = result.ultimaAtualizacao;
+  localStorage.setItem(STORAGE_KEY, ultimaLeitura);
+  senhas = result.senhas;
+  render();
 }
 
 // Inicia painel de classificação
@@ -284,11 +261,6 @@ async function chamarPaciente(senha) {
     const result = await resp.json();
     if (result.success) {
       mostrarMensagem("Chamada registrada com sucesso.");
-
-      // 🚀 Atualização imediata após clique em chamar
-      isFirstLoad = true;
-      carregarSenhas();
-      
     } else {
       alert("Erro ao registrar chamada: " + result.message);
     }
@@ -296,5 +268,3 @@ async function chamarPaciente(senha) {
     alert("Erro na conexão: " + err.message);
   }
 }
-
-
