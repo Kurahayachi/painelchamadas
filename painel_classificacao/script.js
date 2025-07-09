@@ -46,21 +46,18 @@ function render() {
   senhas.forEach(({ senha, data, status }) => {
     const tr = document.createElement("tr");
 
-    // ⬇️ NOVO: Fundo vermelho se já estiver em triagem ⬇️
+    // ⬇️ Destaque visual para "Em triagem"
     if (status === "Em triagem") {
       tr.style.backgroundColor = "#ffcccc";
     }
 
-    let botoes = "";
-    if (status === "Em triagem") {
-      botoes = `<button class="btn-finalizar" onclick="finalizarTriagem('${senha}')">Finalizar Classificação</button>`;
-    } else {
-      botoes = `
-        <button class="btn-chamar chamarBtn" data-senha="${senha}">📣 Chamar</button>
-        <button class="btn-primario editarBtn" data-senha="${senha}">Editar</button>
-        <button class="btn-perigo" onclick="excluirSenha('${senha}')">Excluir</button>
-      `;
-    }
+    // ⬇️ Sempre exibe os três botões
+    let botoes = `
+      <button class="btn-chamar chamarBtn" data-senha="${senha}">📣 Chamar</button>
+      <button class="btn-primario editarBtn" data-senha="${senha}">Editar</button>
+      <button class="btn-perigo" onclick="excluirSenha('${senha}')">Excluir</button>
+    `;
+
     tr.innerHTML = `
       <td>${senha}</td>
       <td>${new Date(data).toLocaleString()}</td>
@@ -70,8 +67,14 @@ function render() {
     tbody.appendChild(tr);
   });
 
-  document.querySelectorAll(".chamarBtn").forEach(btn => btn.addEventListener("click", () => chamarPaciente(btn.dataset.senha)));
-  document.querySelectorAll(".editarBtn").forEach(btn => btn.addEventListener("click", () => abrirModal(btn.dataset.senha)));
+  // Reatribui eventos aos botões dinâmicos
+  document.querySelectorAll(".chamarBtn").forEach(btn =>
+    btn.addEventListener("click", () => chamarPaciente(btn.dataset.senha))
+  );
+
+  document.querySelectorAll(".editarBtn").forEach(btn =>
+    btn.addEventListener("click", () => abrirModal(btn.dataset.senha))
+  );
 }
 
 async function carregarSenhas() {
