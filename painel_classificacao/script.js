@@ -84,14 +84,13 @@ async function carregarSenhas() {
   try {
     const resp = await fetch(url);
     const result = await resp.json();
-    isFirstLoad = false;
 
     if (!result.atualizacao) {
       console.log(`[${new Date().toLocaleTimeString()}] Nenhuma atualização detectada.`);
       return;
     }
 
-    if (result.ultimaAtualizacao && result.ultimaAtualizacao !== ultimaLeitura) {
+    if (result.ultimaAtualizacao && (isFirstLoad || result.ultimaAtualizacao !== ultimaLeitura)) {
       console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada! Novo timestamp: ${result.ultimaAtualizacao}`);
       ultimaLeitura = result.ultimaAtualizacao;
       localStorage.setItem(STORAGE_KEY, ultimaLeitura);
@@ -100,8 +99,11 @@ async function carregarSenhas() {
         senhas = result.senhas;
         render();
       }
+
+      isFirstLoad = false;  // ✅ Só aqui, depois de forçar render
     } else {
       console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada, mas timestamp não mudou.`);
+      isFirstLoad = false;  // ✅ Aqui também para garantir que não fique sempre true
     }
 
   } catch (error) {
