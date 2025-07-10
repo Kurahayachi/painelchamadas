@@ -5,7 +5,7 @@
  * Uso interno permitido mediante autorização do autor.
  */
 
-const WEB_APP_URL_R       = "https://script.google.com/macros/s/AKfycbx_cHpS9iLAaDZXJpiaVSUsMEVs66ak9JH2mR1Iz768si1kBGP5iaZXs8mrMpbrXFA2Ww/exec";
+const WEB_APP_URL_R       = "https://script.google.com/macros/s/AKfycbwwhVVMOwJIfPnAlnPEPT9KWXTrbmJF1nygjnQ4a_cgXa-IQ46W41mqAWD8xV71ZVe4rA/exec";
 const STORAGE_KEY_R = "ultimaAtualizacaoRecepcao";  // combina O2 + Q2
 const POLLING_INTERVAL_R  = 10000;
 
@@ -39,18 +39,16 @@ async function carregarSenhasRecepcao() {
     return;
   }
 
-  // Atualização detectada
   console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada! O2: ${result.ultimaAtualizacaoO2} | Q2: ${result.ultimaAtualizacaoQ2}`);
 
-  // 🔄 Atualiza a chave local combinando os dois timestamps
+  // Grava timestamp combinado O2|Q2
   ultimaLeituraR = `${result.ultimaAtualizacaoO2}|${result.ultimaAtualizacaoQ2}`;
   localStorage.setItem(STORAGE_KEY_R, ultimaLeituraR);
 
-  // Atualiza as senhas e renderiza
+  // Atualiza lista
   senhasR = result.senhas;
   renderRecepcao();
 }
-
 
 function renderRecepcao() {
   tbodyR.innerHTML = "";
