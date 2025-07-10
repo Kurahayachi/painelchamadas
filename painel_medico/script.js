@@ -133,7 +133,7 @@ function render() {
         <td>${especialidade}</td>
         <td><span class="cor-bolinha cor-${cor?.trim() || ""}"></span></td>
         <td>
-          <button class="btn-primario" onclick="chamarPaciente('${senha}')">📣</button>
+          <button class="btn-primario" onclick="chamarPaciente('${senha}')">📣 Chamar</button>
           <button class="btn-finalizar" onclick="abrirModalConfirmar('${senha}')">Finalizar</button>
 
         </td>
