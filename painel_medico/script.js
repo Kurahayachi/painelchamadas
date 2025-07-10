@@ -1,9 +1,26 @@
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw2cQ_qQXV704KTz3miKuqg5-tnrNAoDPf9go5Y5ZjCzwj2HVWadjnR9gfd8J7UKo96/exec";
+//const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw2cQ_qQXV704KTz3miKuqg5-tnrNAoDPf9go5Y5ZjCzwj2HVWadjnR9gfd8J7UKo96/exec";
+function getWebAppUrl(consultorio) {
+  const numero = parseInt(consultorio?.replace(/\D/g, "") || "0");
+
+  if (numero >= 1 && numero <= 3)
+    return "https://script.google.com/macros/s/AKfycbxkIhETWfF2bNWtGs6anLunrQtockjJBKcMLbiUvptIUowrX-G9yA5XFPuSoHCvQvv_/exec";
+  if (numero >= 4 && numero <= 6)
+    return "https://script.google.com/macros/s/AKfycbwq478S475027hYkhkF3RA8YmCV7YzkCtQ5PQ8Ky58AriLOyNyAdrZWlsrFScAQi23V/exec";
+  if (numero >= 7 && numero <= 9)
+    return "https://script.google.com/macros/s/AKfycbzFh1hzyQvw3ijj4k8tPZhPBwtmzVeInp3KBAFncFeTkyXObp-d8rGSNpCwQQhZcrbT/exec";
+  if (numero >= 10 && numero <= 12)
+    return "https://script.google.com/macros/s/AKfycbxR6DcsRmYQOVehWIDemVqexG0TCvGy7ou4OPOVkKAxFcg6BKysO4432SzET1b_lu2a/exec";
+
+  return ""; // valor padrão se nada for selecionado
+}
+
+let consultorioSelecionado = localStorage.getItem("consultorioSelecionado") || "";
+const WEB_APP_URL = getWebAppUrl(consultorioSelecionado);
+
 const STORAGE_KEY = "ultimaAtualizacaoMedico";
 let ultimaLeitura = localStorage.getItem(STORAGE_KEY) || "";
 let isFirstLoad = true;
 let senhas = [];
-let consultorioSelecionado = "";
 let especialidadesSelecionadas = [];
 
 const tbody = document.querySelector("#senhaTable tbody");
@@ -32,7 +49,9 @@ document.getElementById("salvarMaquinaBtn").addEventListener("click", () => {
   localStorage.setItem("consultorioSelecionado", consultorioSelecionado);
   spanMaquina.textContent = `(Consultório atual: ${consultorioSelecionado})`;
   document.getElementById("modalMaquina").classList.remove("show");
-  carregarSenhas(true);
+  
+  window.location.reload(); // Força recarregamento para usar nova URL correta
+
 });
 
 // Filtro especialidade
