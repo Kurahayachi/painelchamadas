@@ -1,17 +1,22 @@
 //const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw2cQ_qQXV704KTz3miKuqg5-tnrNAoDPf9go5Y5ZjCzwj2HVWadjnR9gfd8J7UKo96/exec";
 function getWebAppUrl(consultorio) {
-  const numero = parseInt(consultorio?.replace(/\D/g, "") || "0");
+  const map = {
+    "1":  "https://script.google.com/macros/s/AKfycbxR6DcsRmYQOVehWIDemVqexG0TCvGy7ou4OPOVkKAxFcg6BKysO4432SzET1b_lu2a/exec",
+    "2":  "https://script.google.com/macros/s/AKfycbzFh1hzyQvw3ijj4k8tPZhPBwtmzVeInp3KBAFncFeTkyXObp-d8rGSNpCwQQhZcrbT/exec",
+    "3":  "https://script.google.com/macros/s/AKfycbwq478S475027hYkhkF3RA8YmCV7YzkCtQ5PQ8Ky58AriLOyNyAdrZWlsrFScAQi23V/exec",
+    "4":  "https://script.google.com/macros/s/AKfycbxkIhETWfF2bNWtGs6anLunrQtockjJBKcMLbiUvptIUowrX-G9yA5XFPuSoHCvQvv_/exec",
+    "5":  "https://script.google.com/macros/s/AKfycbzq10EdJRwQ3V34Smmwh9u-GqlpagBZ1crvwh5iPY03gHSOdcKnCcjb3QPN9pY6SsHWAg/exec",
+    "6":  "https://script.google.com/macros/s/AKfycbw36X-6FzPAfAljAEE_dcdh1Xw1RxjwV6ywdFoyv7OGVsivoAmFfSwNNhuUnsuWHa5zQw/exec",
+    "7":  "https://script.google.com/macros/s/AKfycbzXxFWlSTiRJzEP4ghxTLCC-0muxEOTBU_JA9y9CpIP-Nhr9EfyKSwhOZsax7LriTRU/exec",
+    "8":  "https://script.google.com/macros/s/AKfycbwLJG1980Wypf20lQOc1iLuDoVdKFYJUHvAuYEG0c6hhExdKGZmLGFsP_NicIijWp29/exec",
+    "9":  "https://script.google.com/macros/s/AKfycbzUdlbSnWdQuqlqTVEN61-D4XxpbTvj7NZG-yisanB_OKyKfU517MiwhRLfXVAO_1q7/exec",
+    "10": "https://script.google.com/macros/s/AKfycbwpMwIclLu44CWI-JgCxY2euwAA57ZZiaRQYvI0veeBnHf2grzFJ5IoLlbvOqByD9jh/exec",
+    "11": "https://script.google.com/macros/s/AKfycbx38jlaW3rA6QvtFY0LQHKDrBCnf144Ei8pyc9HMQ0UzIsSHGfR-ZJnJMzotq8Iq0S6/exec",
+    "12": "https://script.google.com/macros/s/AKfycbyc2FYKhJBO6TXhM70J9QnEPEbM7qAssk1LYn4tB85pMiG-mPiMzqZdQz-KrlNUJaul/exec"
+  };
 
-  if (numero >= 1 && numero <= 3)
-    return "https://script.google.com/macros/s/AKfycbxkIhETWfF2bNWtGs6anLunrQtockjJBKcMLbiUvptIUowrX-G9yA5XFPuSoHCvQvv_/exec";
-  if (numero >= 4 && numero <= 6)
-    return "https://script.google.com/macros/s/AKfycbwq478S475027hYkhkF3RA8YmCV7YzkCtQ5PQ8Ky58AriLOyNyAdrZWlsrFScAQi23V/exec";
-  if (numero >= 7 && numero <= 9)
-    return "https://script.google.com/macros/s/AKfycbzFh1hzyQvw3ijj4k8tPZhPBwtmzVeInp3KBAFncFeTkyXObp-d8rGSNpCwQQhZcrbT/exec";
-  if (numero >= 10 && numero <= 12)
-    return "https://script.google.com/macros/s/AKfycbxR6DcsRmYQOVehWIDemVqexG0TCvGy7ou4OPOVkKAxFcg6BKysO4432SzET1b_lu2a/exec";
-
-  return ""; // valor padrão se nada for selecionado
+  const numero = consultorio?.replace(/\D/g, "");
+  return map[numero] || "";
 }
 
 let consultorioSelecionado = localStorage.getItem("consultorioSelecionado") || "";
