@@ -5,7 +5,7 @@
  * Uso interno permitido mediante autorização do autor.
  */
 
-const WEB_APP_URL_R       = "https://script.google.com/macros/s/AKfycbweN4czjc7f1eeTjXXTgbPuY3EJaveZ-kE7AZs4n_OHVjSNNUTfb6CFs4xWQPHcPanbPA/exec";
+const WEB_APP_URL_R       = "https://script.google.com/macros/s/AKfycbyqqn-e4U9qxFq1irjb38qwdW9cizigL3-xlnd0LwSWd4V8TJewlhkXxwDlDi7CuY1ZIw/exec";
 const STORAGE_KEY_R = "ultimaAtualizacaoRecepcao";  // combina O2 + Q2
 const POLLING_INTERVAL_R  = 10000;
 
@@ -51,7 +51,7 @@ async function carregarSenhasRecepcao() {
 
 function renderRecepcao() {
   tbodyR.innerHTML = "";
-  senhasR.forEach(({ senha, data, nome, status }) => {
+  senhasR.forEach(({ senha, data, nome, status, cor }) => {
   const tr = document.createElement("tr");
 
   // 🔴 Destacar "Em atendimento"
@@ -60,16 +60,17 @@ function renderRecepcao() {
   }
 
   tr.innerHTML = `
-    <td>${senha}</td>
-    <td>${new Date(data).toLocaleString()}</td>
-    <td>${nome}</td>
-    <td>${status}</td>
-    <td>
-      <button class="btn-primario chamarBtn" data-senha="${senha}">📣 Chamar</button>
-      <button class="btn-finalizar finalizarBtn" data-senha="${senha}">Finalizar</button>
-      <button class="btn-perigo excluirBtn" data-senha="${senha}">Excluir</button>
-    </td>
-  `;
+  <td>${senha}</td>
+  <td>${new Date(data).toLocaleString()}</td>
+  <td>${nome || "-"}</td>
+  <td>${status}</td>
+  <td><span class="cor-bolinha cor-${cor?.trim() || ""}"></span></td>
+  <td>
+    <button class="btn-primario chamarBtn" data-senha="${senha}">📣 Chamar</button>
+    <button class="btn-finalizar finalizarBtn" data-senha="${senha}">Finalizar</button>
+    <button class="btn-perigo excluirBtn" data-senha="${senha}">Excluir</button>
+  </td>
+`;
   tbodyR.appendChild(tr);
 });
 

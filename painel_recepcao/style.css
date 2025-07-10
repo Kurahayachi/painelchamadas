@@ -214,6 +214,19 @@ button {
     opacity: 1;
   }
 }
+/* Bolinha de cor da classificação */
+.cor-bolinha {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid #aaa;
+}
+
+.cor-Vermelho { background-color: red; }
+.cor-Amarelo  { background-color: yellow; }
+.cor-Verde    { background-color: green; }
+.cor-Azul     { background-color: blue; }
 
 
 main {
