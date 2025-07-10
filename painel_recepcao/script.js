@@ -5,7 +5,7 @@
  * Uso interno permitido mediante autorização do autor.
  */
 
-const WEB_APP_URL_R       = "https://script.google.com/macros/s/AKfycbwwhVVMOwJIfPnAlnPEPT9KWXTrbmJF1nygjnQ4a_cgXa-IQ46W41mqAWD8xV71ZVe4rA/exec";
+const WEB_APP_URL_R       = "https://script.google.com/macros/s/AKfycbweN4czjc7f1eeTjXXTgbPuY3EJaveZ-kE7AZs4n_OHVjSNNUTfb6CFs4xWQPHcPanbPA/exec";
 const STORAGE_KEY_R = "ultimaAtualizacaoRecepcao";  // combina O2 + Q2
 const POLLING_INTERVAL_R  = 10000;
 
@@ -34,18 +34,17 @@ async function carregarSenhasRecepcao() {
   const resp = await fetch(url);
   const result = await resp.json();
 
+  const tsServidorCombinado = `${result.ultimaAtualizacaoO2}|${result.ultimaAtualizacaoQ2}`;
+
   if (!result.atualizacao) {
     console.log(`[${new Date().toLocaleTimeString()}] Nenhuma atualização detectada.`);
     return;
   }
 
-  console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada! O2: ${result.ultimaAtualizacaoO2} | Q2: ${result.ultimaAtualizacaoQ2}`);
+  console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada! ISO: ${tsServidorCombinado}`);
 
-  // Grava timestamp combinado O2|Q2
-  ultimaLeituraR = `${result.ultimaAtualizacaoO2}|${result.ultimaAtualizacaoQ2}`;
+  ultimaLeituraR = tsServidorCombinado;
   localStorage.setItem(STORAGE_KEY_R, ultimaLeituraR);
-
-  // Atualiza lista
   senhasR = result.senhas;
   renderRecepcao();
 }
