@@ -1,4 +1,4 @@
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz_pb2JMaCO-fuTVfXmY7iEXA3SWRxXMRZqL5Q1M6TRhW3HUFAWOnM4OxoGFyidGSxi/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw2cQ_qQXV704KTz3miKuqg5-tnrNAoDPf9go5Y5ZjCzwj2HVWadjnR9gfd8J7UKo96/exec";
 const STORAGE_KEY = "ultimaAtualizacaoMedico";
 let ultimaLeitura = localStorage.getItem(STORAGE_KEY) || "";
 let isFirstLoad = true;
@@ -133,8 +133,9 @@ function render() {
         <td>${especialidade}</td>
         <td><span class="cor-bolinha cor-${cor?.trim() || ""}"></span></td>
         <td>
-          <button onclick="chamarPaciente('${senha}')">📣</button>
-          <button onclick="abrirModalConfirmar('${senha}')">Finalizar</button>
+          <button class="btn-primario" onclick="chamarPaciente('${senha}')">📣</button>
+          <button class="btn-finalizar" onclick="abrirModalConfirmar('${senha}')">Finalizar</button>
+
         </td>
       `;
       tbody.appendChild(tr);
