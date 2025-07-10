@@ -1,140 +1,59 @@
 /**
- * Sistema de Gestão de Senhas
+ * Sistema de Gestão de Atendimento
  * Desenvolvido por Igor M. Kurahayachi
  * Todos os direitos reservados.
  * Uso interno permitido mediante autorização do autor.
  */
 
-const WEB_APP_URL =
-    "https://script.google.com/macros/s/AKfycbx57ZUS6-8T2OxhryCXEcjT8Qxgp5P4M44KJ4xbX5nZLg0mZKKqdqzfEvwqLLIiC9Nr/exec";
-
-// Auto-reload a cada 15 minutos para manter a sessão ativa
-setInterval(() => {
-    console.log("⏳ 15 minutos se passaram, recarregando o painel de médico...");
-    location.reload();
-}, 15 * 60 * 1000);
-
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz_pb2JMaCO-fuTVfXmY7iEXA3SWRxXMRZqL5Q1M6TRhW3HUFAWOnM4OxoGFyidGSxi/exec";
+const STORAGE_KEY = "ultimaAtualizacaoMedico";
+let ultimaLeitura = localStorage.getItem(STORAGE_KEY) || "";
+let isFirstLoad = true;
 let senhas = [];
 let consultorioSelecionado = "";
-let especialidadesSelecionadas = [];
-let ultimaLeitura = "";
-let senhaConfirmar = "";    // necessário para o modal de finalizar
-let senhaSelecionada = "";  // guarda a senha ao abrir o modal
 
 const tbody = document.querySelector("#senhaTable tbody");
 const spanMaquina = document.getElementById("spanMaquina");
-const modalMaquina = document.getElementById("modalMaquina");
-const btnEngrenagem = document.getElementById("btnEngrenagem");
-const salvarMaquinaBtn = document.getElementById("salvarMaquinaBtn");
-const cancelarMaquinaBtn = document.getElementById("cancelarMaquinaBtn");
-const btnFiltro = document.getElementById("btnFiltroEspecialidade");
-const filtroEspecialidades = document.getElementById("filtroEspecialidades");
-const selectAll = document.getElementById("selectAll");
 
-// Notificador visual
-const notificador = document.createElement("div");
-notificador.id = "notificador";
-Object.assign(notificador.style, {
-  position: "fixed", top: "15px", left: "50%",
-  transform: "translateX(-50%)",
-  background: "#38c172", color: "white",
-  padding: "10px 20px", borderRadius: "5px",
-  display: "none", zIndex: "9999", fontWeight: "bold",
-  boxShadow: "0 2px 6px rgba(0,0,0,0.2)"
-});
-document.body.appendChild(notificador);
+// Carregamento automático a cada 15 min
+setInterval(() => location.reload(), 15 * 60 * 1000);
 
-function mostrarMensagem(texto) {
-  notificador.textContent = texto;
-  notificador.style.display = "block";
-  setTimeout(() => notificador.style.display = "none", 3000);
-}
-
-// Configuração do consultório
-btnEngrenagem.addEventListener("click", () => {
-  modalMaquina.classList.add("show");
+// Modal configuração
+document.getElementById("btnEngrenagem").addEventListener("click", () => {
+  document.getElementById("modalMaquina").classList.add("show");
   const saved = localStorage.getItem("consultorioSelecionado");
   if (saved) {
     document.querySelectorAll("input[name='consultorio']")
       .forEach(r => r.checked = r.value === saved);
   }
 });
-cancelarMaquinaBtn.addEventListener("click", () => modalMaquina.classList.remove("show"));
-salvarMaquinaBtn.addEventListener("click", () => {
-  const sel = document.querySelector("input[name='consultorio']:checked");
-  if (!sel) { alert("Selecione um consultório."); return; }
-  consultorioSelecionado = sel.value;
-  localStorage.setItem("consultorioSelecionado", consultorioSelecionado);
-  spanMaquina.textContent = `(Consultório atual: ${consultorioSelecionado})`;
-  modalMaquina.classList.remove("show");
-  carregarSenhas();
-});
+document.getElementById("cancelarMaquinaBtn")
+  .addEventListener("click", () => document.getElementById("modalMaquina").classList.remove("show"));
+document.getElementById("salvarMaquinaBtn")
+  .addEventListener("click", () => {
+    const sel = document.querySelector("input[name='consultorio']:checked");
+    if (!sel) return alert("Selecione um consultório.");
+    consultorioSelecionado = sel.value;
+    localStorage.setItem("consultorioSelecionado", consultorioSelecionado);
+    spanMaquina.textContent = `(Consultório atual: ${consultorioSelecionado})`;
+    document.getElementById("modalMaquina").classList.remove("show");
+    carregarSenhas(true);
+  });
 
-// Filtro de especialidades
-btnFiltro.addEventListener("click", () => filtroEspecialidades.classList.toggle("show"));
-document.getElementById("fecharFiltroBtn")
-  .addEventListener("click", () => filtroEspecialidades.classList.remove("show"));
-selectAll.addEventListener("change", () => {
-  document.querySelectorAll(".especialidade").forEach(cb => cb.checked = selectAll.checked);
-  atualizarFiltroEspecialidades();
-});
-document.querySelectorAll(".especialidade").forEach(cb =>
-  cb.addEventListener("change", atualizarFiltroEspecialidades)
-);
+// Modal confirmação
+let senhaSelecionada = "";
+document.getElementById("btnCancelarConfirmar")
+  .addEventListener("click", () => document.getElementById("modalConfirmar").classList.remove("show"));
+document.getElementById("btnConfirmarFinalizar")
+  .addEventListener("click", finalizarAtendimento);
 
-function atualizarFiltroEspecialidades() {
-  especialidadesSelecionadas = Array.from(
-    document.querySelectorAll(".especialidade:checked")
-  ).map(cb => cb.value);
-  render();
-}
-
-function render() {
-  tbody.innerHTML = "";
-  senhas
-    .filter(s =>
-      !especialidadesSelecionadas.length ||
-      especialidadesSelecionadas.includes(s.especialidade)
-    )
-    .forEach(({ senha, nome, idade, data, status, especialidade, cor }) => {
-      const corClasse = `cor-${(cor||"").trim().replace(/\s+/g,"")}`;
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${senha}</td>
-        <td>${nome||"-"}</td>
-        <td>${idade||"-"}</td>
-        <td>${new Date(data).toLocaleString()}</td>
-        <td>${status}</td>
-        <td>${especialidade}</td>
-        <td><span class="cor-bolinha ${corClasse}"></span></td>
-        <td>
-          <button class="btn-primario" onclick="chamarPaciente('${senha}')">📣 Chamar</button>
-          <button class="btn-finalizar" onclick="abrirModalConfirmar('${senha}')">Finalizar</button>
-        </td>
-
-      `;
-      tbody.appendChild(tr);
-    });
-}
-
-async function chamarPaciente(senha) {
-  if (!consultorioSelecionado) {
-    alert("Você precisa selecionar um consultório."); return;
-  }
-
-  try {
-    const resp = await fetch(
-      `${WEB_APP_URL}?action=registrarChamadaTV&senha=${encodeURIComponent(senha)}&consultorio=${encodeURIComponent(consultorioSelecionado)}`
-    );
-    const result = await resp.json();
-    if (result.success) {
-      mostrarMensagem("Paciente chamado com sucesso.");
-    } else {
-      alert("Erro ao chamar: " + result.message);
-    }
-  } catch (err) {
-    console.warn("Erro ao chamar:", err);
-  }
+// Mensagem visual
+function mostrarMensagem(texto) {
+  const el = document.createElement("div");
+  el.textContent = texto;
+  el.style.cssText = "position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#38c172;color:#fff;padding:10px 20px;border-radius:5px;z-index:9999;font-weight:bold";
+  document.body.appendChild(el);
+  setTimeout(() => document.body.removeChild(el), 3000);
 }
 
 function abrirModalConfirmar(senha) {
@@ -143,49 +62,90 @@ function abrirModalConfirmar(senha) {
   document.getElementById("modalConfirmar").classList.add("show");
 }
 
-async function finalizarTriagemModal() {
-  if (!consultorioSelecionado) {
-    alert("Você precisa selecionar um consultório."); return;
-  }
+async function chamarPaciente(senha) {
+  if (!consultorioSelecionado) return alert("Selecione um consultório.");
 
   try {
-    const resp = await fetch(
-      `${WEB_APP_URL}?action=liberar&senha=${encodeURIComponent(senhaSelecionada)}&consultorio=${encodeURIComponent(consultorioSelecionado)}`
-    );
+    const resp = await fetch(`${WEB_APP_URL}?action=registrarChamadaTV&senha=${encodeURIComponent(senha)}&consultorio=${encodeURIComponent(consultorioSelecionado)}`);
     const result = await resp.json();
     if (result.success) {
-      mostrarMensagem("Atendimento finalizado com sucesso.");
-      document.getElementById("modalConfirmar").classList.remove("show");
-      // força recarregamento completo para sumir a senha finalizada
-      ultimaLeitura = "";
-      await carregarSenhas();
+      mostrarMensagem("Paciente chamado.");
+      isFirstLoad = true;
+      carregarSenhas(true);
     } else {
-      alert("Erro ao finalizar: " + result.message);
+      alert("Erro ao chamar: " + result.message);
     }
-  } catch (err) {
-    console.warn("Erro ao finalizar:", err);
+  } catch (e) {
+    console.error("Erro ao chamar:", e);
   }
 }
 
-async function carregarSenhas() {
+async function finalizarAtendimento() {
+  if (!consultorioSelecionado) return alert("Selecione um consultório.");
+
   try {
-    const url = `${WEB_APP_URL}?action=listar${ultimaLeitura ? `&timestamp=${encodeURIComponent(ultimaLeitura)}` : ""}`;
+    const resp = await fetch(`${WEB_APP_URL}?action=liberar&senha=${encodeURIComponent(senhaSelecionada)}&consultorio=${encodeURIComponent(consultorioSelecionado)}`);
+    const result = await resp.json();
+    if (result.success) {
+      mostrarMensagem("Atendimento finalizado.");
+      document.getElementById("modalConfirmar").classList.remove("show");
+      isFirstLoad = true;
+      carregarSenhas(true);
+    } else {
+      alert("Erro ao finalizar: " + result.message);
+    }
+  } catch (e) {
+    console.error("Erro ao finalizar:", e);
+  }
+}
+
+function render() {
+  tbody.innerHTML = "";
+  senhas.forEach(({ senha, nome, idade, data, status, especialidade, cor }) => {
+    const tr = document.createElement("tr");
+    if (status === "Em atendimento") tr.style.background = "#ffe5e5";
+    tr.innerHTML = `
+      <td>${senha}</td>
+      <td>${nome || "-"}</td>
+      <td>${idade || "-"}</td>
+      <td>${new Date(data).toLocaleString()}</td>
+      <td>${status}</td>
+      <td>${especialidade}</td>
+      <td><span class="cor-bolinha cor-${cor?.trim() || ""}"></span></td>
+      <td>
+        <button onclick="chamarPaciente('${senha}')">📣</button>
+        <button onclick="abrirModalConfirmar('${senha}')">Finalizar</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+async function carregarSenhas(forcarAtualizacao = false) {
+  const tsCliente = forcarAtualizacao || isFirstLoad ? "" : ultimaLeitura;
+  isFirstLoad = false;
+
+  try {
+    const url = `${WEB_APP_URL}?action=listar&timestamp=${encodeURIComponent(tsCliente)}`;
     const resp = await fetch(url);
     const result = await resp.json();
+
     if (!result.atualizacao) {
       console.log(`[${new Date().toLocaleTimeString()}] Nenhuma atualização detectada.`);
       return;
     }
-    console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada! timestamp: ${result.ultimaLeitura}`);
+
+    console.log(`[${new Date().toLocaleTimeString()}] Atualização detectada!`, result.ultimaLeitura);
     senhas = result.senhas;
     ultimaLeitura = result.ultimaLeitura;
+    localStorage.setItem(STORAGE_KEY, ultimaLeitura);
     render();
-  } catch (err) {
-    console.warn("Erro ao carregar senhas:", err);
+  } catch (e) {
+    console.error("Erro ao carregar senhas:", e);
   }
 }
 
-window.addEventListener("load", async () => {
+window.addEventListener("load", () => {
   consultorioSelecionado = localStorage.getItem("consultorioSelecionado") || "";
   if (consultorioSelecionado) {
     spanMaquina.textContent = `(Consultório atual: ${consultorioSelecionado})`;
@@ -193,12 +153,7 @@ window.addEventListener("load", async () => {
 
   window.chamarPaciente = chamarPaciente;
   window.abrirModalConfirmar = abrirModalConfirmar;
-  document.getElementById("btnCancelarConfirmar")
-    .addEventListener("click", () => document.getElementById("modalConfirmar").classList.remove("show"));
-  document.getElementById("btnConfirmarFinalizar")
-    .addEventListener("click", finalizarTriagemModal);
 
-  await carregarSenhas();
-  setInterval(carregarSenhas, 10000);
-
+  carregarSenhas(true);
+  setInterval(() => carregarSenhas(false), 10000);
 });
