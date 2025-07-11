@@ -4,7 +4,18 @@
  * Todos os direitos reservados.
  * Uso interno permitido mediante autorização do autor.
  */
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwm3CCr-NsvZNiC7hyn1x878YhQ3zUHer3f_awmXuPyz6l7bvUZuUXqFsg5oejIocL5/exec";
+
+/**
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwm3CCr-NsvZNiC7hyn1x878YhQ3zUHer3f_awmXuPyz6l7bvUZuUXqFsg5oejIocL5/exec";**/
+
+function getWebAppUrlClassificacao(maquina) {
+  const urls = {
+    "Classificação 01": "https://script.google.com/macros/s/AKfycbwnQ5EWVFmcrvcFEKDQV5QPMXoJhZEwkwkcNohSlxb1DLtzRQxWoJDYmWW2j9eqkoUl/exec",
+    "Classificação 02": "https://script.google.com/macros/s/AKfycbz7LdSnKjREHxGTfex2ZNOYtwyflNf4b8uJQiLj3f62a7u3FMHPRqd43LvWad6zfeEl/exec"
+  };
+  return urls[maquina] || urls["Classificação 01"];
+}
+
 const STORAGE_KEY = "ultimaAtualizacaoClassificacao";    // combina L2 + O2
 
 // Auto-reload a cada 15 minutos para manter a sessão ativa
@@ -246,12 +257,21 @@ salvarMaquinaBtn.addEventListener("click", () => {
     localStorage.setItem("maquinaSelecionada", maquina);
     spanMaquina.textContent = `(Máquina atual: ${maquina})`;
     modalMaquina.classList.remove("show");
-    carregarSenhas(maquina);
+
+    // 👉 ATUALIZA a URL com base na nova máquina
+    window.WEB_APP_URL = getWebAppUrlClassificacao(maquina);
+
+    // 👉 Recarrega os dados com a nova URL
+    isFirstLoad = true; // força fetch completo ao trocar de máquina
+    carregarSenhas();
 });
 
 window.addEventListener("load", () => {
   const maquina = localStorage.getItem("maquinaSelecionada") || "Classificação 01";
   spanMaquina.textContent = `(Máquina atual: ${maquina})`;
+
+  // Define a URL dinâmica com base na máquina selecionada
+  window.WEB_APP_URL = getWebAppUrlClassificacao(maquina);
 
   window.abrirModal = abrirModal;
   window.excluirSenha = excluirSenha;
