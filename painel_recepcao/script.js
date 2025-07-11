@@ -4,8 +4,23 @@
  * Todos os direitos reservados.
  * Uso interno permitido mediante autorização do autor.
  */
+/* *
+const WEB_APP_URL_R       = "https://script.google.com/macros/s/AKfycbyqqn-e4U9qxFq1irjb38qwdW9cizigL3-xlnd0LwSWd4V8TJewlhkXxwDlDi7CuY1ZIw/exec";**/
 
-const WEB_APP_URL_R       = "https://script.google.com/macros/s/AKfycbyqqn-e4U9qxFq1irjb38qwdW9cizigL3-xlnd0LwSWd4V8TJewlhkXxwDlDi7CuY1ZIw/exec";
+function getWebAppUrlRecepcao(maquina) {
+  const map = {
+    "Recepção 01": "https://script.google.com/macros/s/AKfycbx0jgZOcak365hNpPDDKAs9BMpAha5PycNuTTanXvCyeoNaxKfWZVOnrqpdJhDBjB-i/exec",
+    "Recepção 02": "https://script.google.com/macros/s/AKfycbwUR4u8cmuFGPzPFuHSuejgs7zmH6GtibOkXGCQUlqiMh9GswepCE6QQb6eiGK55bnz/exec",
+    "Recepção 03": "https://script.google.com/macros/s/AKfycbzbYWKjNa12_Q2tW9zx6veEMYg_PYWx7Ae0S2oSRYIZ_3u0zpQvi6F83-tJqNiw8ZuS/exec",
+    "Recepção 04": "https://script.google.com/macros/s/AKfycbz-3prlZigqi6k3Ntme9lFLIqVJuFzE-ZW3-nCd1lgNhRNCE_uxTMYauD0oeISfHVWD/exec"
+  };
+  return map[maquina] || "";
+}
+
+let maquinaSelecionada = localStorage.getItem("maquinaSelecionada") || "Recepção 01";
+const WEB_APP_URL_R = getWebAppUrlRecepcao(maquinaSelecionada);
+
+
 const STORAGE_KEY_R = "ultimaAtualizacaoRecepcao";  // combina O2 + Q2
 const POLLING_INTERVAL_R  = 10000;
 
@@ -211,11 +226,16 @@ salvarMaquinaBtn.addEventListener("click", () => {
   localStorage.setItem("maquinaSelecionada", selecionado.value);
   spanMaquina.textContent = `(Máquina atual: ${selecionado.value})`;
   modalMaquina.classList.remove("show");
-  carregarSenhasRecepcao();
+  clocation.reload();
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-  spanMaquina.textContent = `(Máquina atual: ${localStorage.getItem("maquinaSelecionada") || "Recepção 01"})`;
+  maquinaSelecionada = localStorage.getItem("maquinaSelecionada") || "Recepção 01";
+  spanMaquina.textContent = `(Máquina atual: ${maquinaSelecionada})`;
+
+  // Atualiza a URL com base na máquina selecionada
+  window.WEB_APP_URL_R = getWebAppUrlRecepcao(maquinaSelecionada);
+
   document.getElementById("btnCancelarConfirmar").addEventListener("click", fecharModalConfirmar);
   document.getElementById("btnConfirmarFinalizar").addEventListener("click", finalizarSenha);
   iniciarAtualizacaoAutomatica();
