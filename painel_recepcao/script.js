@@ -184,7 +184,7 @@ const modalMaquina = document.getElementById("modalMaquina");
 const btnEngrenagem = document.getElementById("btnEngrenagem");
 const salvarRecepcaoBtn = document.getElementById("salvarMaquinaBtn");
 const cancelarRecepcaoBtn = document.getElementById("cancelarMaquinaBtn");
-const spanRecepcao = document.getElementById("spanRecepcao");
+const spanRecepcao = document.getElementById("spanMaquina");
 
 btnEngrenagem.addEventListener("click", () => {
   modalMaquina.classList.add("show");
